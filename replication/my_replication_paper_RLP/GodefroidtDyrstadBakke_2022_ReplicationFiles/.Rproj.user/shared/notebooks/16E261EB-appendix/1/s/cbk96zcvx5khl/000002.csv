@@ -1,0 +1,3 @@
+"0","annotate_figure(figure,"
+"0","                bottom = text_grob(""Data source: Google Trends\nNumbers represent search interest relative to the highest point on the chart for the given region and time.\nA value of 100 is the peak popularity for the term. A value of 50 means that the term is half as popular.\nA score of 0 means there was not enough data for this term."", color = ""black"","
+"0","                                   hjust = 1, x = 1, face = ""italic"", size = 8))"

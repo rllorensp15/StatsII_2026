@@ -1,0 +1,4 @@
+"0","#conflict"
+"0","reside.conflict <- glm(reside ~ referendum, data = Brexit, family = ""binomial"")"
+"0","exposure <- glm(exposure ~ referendum, data = Brexit, family = ""binomial"")"
+"0","PTSD <- lm(ptsd ~ referendum, data = Brexit)"

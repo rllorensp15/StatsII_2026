@@ -1,0 +1,2 @@
+"0","#attrition"
+"0","attrition <- lm(causes_missing ~ referendum, data = Brexit)"

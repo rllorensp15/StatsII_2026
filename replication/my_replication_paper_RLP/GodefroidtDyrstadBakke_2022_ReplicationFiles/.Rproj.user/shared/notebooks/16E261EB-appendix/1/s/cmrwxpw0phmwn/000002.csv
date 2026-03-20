@@ -1,0 +1,2 @@
+"0","#placebo outcome"
+"0","placebo.outcome <- lm(q611 ~ referendum, data = Brexit)"

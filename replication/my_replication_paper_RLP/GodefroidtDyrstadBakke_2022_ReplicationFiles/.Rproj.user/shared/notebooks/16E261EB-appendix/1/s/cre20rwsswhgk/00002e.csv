@@ -1,0 +1,6 @@
+"0",""
+"0","### LEGEND ### "
+"0","legend(x=-2.3, y=-0.65, horiz = T, cex = 0.7,"
+"0","       legend=c(""Matching"", ""Covariates"", ""No Correction""), "
+"0","       title = ""Applied correction for imbalance"", "
+"0","       lty = c(1,2,4), col=c(""black"", ""grey20"", ""grey50""), pch=c(21,4,6))"

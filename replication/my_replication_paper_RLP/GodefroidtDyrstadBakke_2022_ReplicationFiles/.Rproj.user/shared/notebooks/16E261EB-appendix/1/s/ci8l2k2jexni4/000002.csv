@@ -1,0 +1,3 @@
+"0","#politics"
+"0","pol.interest <- lm(polinterest ~ referendum, data = Brexit)"
+"0","pol.participation <- glm(nonvote ~ referendum, data = Brexit, family = ""binomial"")"

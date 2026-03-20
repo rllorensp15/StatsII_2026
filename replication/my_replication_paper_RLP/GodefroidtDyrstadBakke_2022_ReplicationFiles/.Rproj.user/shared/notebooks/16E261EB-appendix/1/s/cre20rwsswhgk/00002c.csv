@@ -1,0 +1,3 @@
+"0",""
+"0","### Settings to print legend to the device region"
+"0","par(xpd=NA)"

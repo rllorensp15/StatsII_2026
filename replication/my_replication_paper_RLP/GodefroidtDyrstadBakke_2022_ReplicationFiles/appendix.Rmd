@@ -1,0 +1,2333 @@
+---
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    fig_caption: true
+title: "The past, Brexit, and the future in Northern Ireland: A quasi-experiment"
+subtitle: "**Online Appendix**"
+thanks: "All replication files, including the R Markdown script to render this Online Appendix, are available on: https://dataverse.harvard.edu/dataverse/godefroidt; **Corresponding author**: amelie.godefroidt@ntnu.no."
+author:
+- Amélie Godefroidt
+- Karin Dyrstad
+- Kristin Bakke
+date:
+bibliography: references.bib
+geometry: margin=1in
+fontsize: 10pt
+endnote: no
+header-includes:
+   - \usepackage{threeparttable, multirow, booktabs, array}
+   - \newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+   - \newcolumntype{M}[1]{>{\centering\arraybackslash}m{#1}}
+   - \usepackage{dcolumn}
+   - \usepackage{rotating, graphicx}
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+knitr::opts_chunk$set(echo = TRUE)
+Sys.setlocale("LC_TIME", "C")
+
+#install.packages("...") if you haven't installed them yet.
+library(Hmisc)
+library(stargazer)
+library(haven)
+library(pander)
+library(DescTools)
+library(mediation)
+library(tidyverse)
+library(viridis)
+library(grid)
+library(gridExtra)
+library(ggplot2)
+library(rio)
+library(WeightIt)
+library(ebal)
+library(Matching)
+library(ggpubr) 
+library(car)
+library(apa)
+library(PerformanceAnalytics)
+library(vtable)
+```
+
+```{r data, include=FALSE}
+#load and clean the data
+Brexit <- read_dta("Data/Brexit.dta")
+```
+
+```{r data cleaning, include=FALSE}
+#clean the data
+Brexit <- Brexit %>% 
+  
+  # Select used variables only
+  dplyr::select(
+    male, age, education, employment_1, religiosity, community, rural,
+    polinterest, nonvote,
+    reside, exposure, ptsd, q411_1,q411_2,q411_3,q411_4,q411_5,q411_6,
+    referendum, referendum2, date, time_zero,
+    cause_1,cause_2,cause_3,cause_4,cause_5,cause_6,cause_7,cause_8,
+    remain, independence, unification,
+    causes_missing, q611, q603ni
+  ) %>%
+  
+  # Measurement levels and labels
+  mutate(
+    male = factor(male, 
+                  levels = c(0, 1),
+                  labels = c("Male", "Female")),
+    education = factor(education, 
+                       levels = c(1,2,3,4,5),
+                       labels = c("Primary school or below",
+                                  "Post-primary (year 8 to year 12)",
+                                  "Post-primary (year 13-14/A level)",
+                                  "Further education",
+                                  "Higher education")),
+    community = factor(community,
+                       levels = c(0,1,2),
+                       labels = c("Protestant",
+                                  "Catholic",
+                                  "None/other"))
+  )
+
+#inspect the data  
+summary(Brexit)
+str(Brexit)
+```
+
+\newpage
+
+# A. Additional Information on Post-conflict Attitudes for Peace Data
+
+## A.1. Sampling and Representativeness 
+
+In order to obtain a representative sample of the Northern Irish population, we used a two-stage probability sampling mechanism. More specifically, the Northern-Irish Postcode Address File was used as a sampling frame, from which households were randomly drawn. One individual, in turn, was selected within the households based on the ‘next birthday’ rule. In Table \ref{repr} below, we double-check whether this sampling mechansism resulted in a sample that adequately represents the Northern Irish population. To do so, we compare our full sample (i.e., before listwise deletion) with the 2011 Census. 
+
+As Table \ref{repr} shows, all descriptive statistics on both the 2016 Post-conflict Attitudes for Peace (PAP) survey and the 2011 Census are highly comparable. There are two minor exceptions, however. First, our sample includes more divorced people. Yet, there were more divorces granted in Northern Ireland in 2016 (i.e., 2572) compared to 2011 (i.e., 2343) [@Clark2019]. Hence, we believe our data still properly reflects the Northern Irish population in 2016. Second, the census covers the population aged 16-74, while the PAP sample includes persons aged 18 and older. The census age distribution excludes residents aged 16-17, but the other statistics include younger respondents as well. This may partly explain the differences in share of students.
+
+
+\vspace{3mm}
+\begin{table}[h] \centering
+\caption{Comparison between PAP Data and 2011 Census} 
+\label{repr} 
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\hline
+               &                         & 2016 PAP (\%) & 2011 Census   (\%) \\ \midrule
+Gender         & Male                    & 47            & 49                 \\
+               & Female                  & 53            & 51                 \\
+Age            & 18-24                   & 14            & 13                 \\
+               & 25-34                   & 17            & 18                 \\
+               & 35-44                   & 17            & 18                 \\
+               & 45-54                   & 19            & 18                 \\
+               & 55-64                   & 15            & 14                 \\
+               & 65 and above            & 18            & 19                 \\
+Marital status & Single                  & 35            & 36                 \\
+               & Married/civil   partner & 42            & 48                 \\
+               & Widowed                 & 8             & 7                  \\
+               & Divorced/separated      & 15            & 9                  \\
+Religion       & Catholic                & 43            & 45                 \\
+               & Protestant              & 50            & 48                 \\
+               & Other/None              & 7             & 7                  \\
+Employment     & Employed                & 51            & 57                 \\
+               & Unemployed              & 14            & 5                  \\
+               & Pensioner               & 20            & 20                 \\
+               & Homemaker               & 9             & 4                  \\
+               & Student                 & 6             & 10                 \\
+               & Other                   & -             & 3                  \\ 
+\hline
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\newpage
+
+
+## A.2. Question Wordings and Response Options for PAP Indicators
+
+In Table 2, we report the exact question wordings of all indicators included in this paper. The indicators have been used as independent, dependent, or control variables in the main or supplementary analyses. We also report the original response options but, as you can see in the table, some variables have been recoded.\footnote{The corresponding Stata script to clean the dataset is available on the first author's Harvard Dataverse. Yet, the raw and full dataset to run this script is not publicy available due to data sharing and privacy restrictions.} We have listed the items in the order they were asked to the respondents. For all questions, respondents could indicate "Do not know" or "Do not want to answer this question" in addition to the response options listed in the table.
+
+
+\vspace{3mm}
+
+
+| Label  | Question Wordings, Response Options, and Recoding Information |
+|--------|--------------------------------------|
+| Date   | *Note: Date of interview coded by interviewer* |
+| Brexit | *Note: Coded based on Date variable* |
+|        | \hspace{.3cm} 0 = Interviewed pre-Brexit |
+|        | \hspace{.3cm} 1 = Interviewed post-Brexit |
+|        | \hspace{.3cm} 2 = Interviewed on the day of EU Referendum --> recoded to 0 in main analyses; excluded in robustness check (see Section D.1 below)|
+| Gender | *Note: Respondent's sex coded by interviewer observation* |
+| (Male) | \hspace{.3cm} 1 = Male |
+|        | \hspace{.3cm} 2 = Female --> recoded to 0|
+| Age    | Can you tell me your age, please? |
+|        | \hspace{.3cm} Age in completed numbers of years |
+| Education  | What is your highest level of education? |
+|        | \hspace{.3cm} 1 = Primary school or below (P1-P7) |
+|        | \hspace{.3cm} 2 = Post-primary (year 8 to year 12) |
+|        | \hspace{.3cm} 3 = Post-primary (year 13-14/A level) |
+|        | \hspace{.3cm} 4 = Further education (vocational/trade schools/apprenticeship) |
+|        | \hspace{.3cm} 5 = Higher education (university, Bachelor or above) |
+| Employment | What is your employment status? |
+| (Employed)| \hspace{.3cm} 1 = Employed (incl. casual laborers, part-time work, and self-employed)|
+|        | \hspace{.3cm} 2 = Unemployed --> recoded to 0|
+|        | \hspace{.3cm} 3 = Pensioner --> recoded to 0|
+|        | \hspace{.3cm} 4 = Homemaker --> recoded to 0 |
+|        | \hspace{.3cm} 5 = Student --> recoded to 0 |
+| Urbanization  | *Note: Type of town coded by interviewer observation* |
+| (Rural) | \hspace{.3cm} 1 = Rural --> recoded to 1|
+|        | \hspace{.3cm} 2 = Semi urban --> recoded to 1|
+|        | \hspace{.3cm} 3 = Urban --> recoded to 0|
+|        | \hspace{.3cm} 4 = District/department capital --> recoded to 0|
+|        | \hspace{.3cm} 5 = Capital city --> recoded to 0|
+| Community | Which of the following communities were you brought up as part of? |
+| (Catholic)| \hspace{.3cm} 1 = No religion --> excluded|
+|        | \hspace{.3cm} 2 = Catholic --> recoded to 1|
+|        | \hspace{.3cm} 3 = Protestant --> recoded to 0|
+|        | \hspace{.3cm} 4 = Jewish --> excluded |
+|        | \hspace{.3cm} 5 = Hindu --> excluded |
+|        | \hspace{.3cm} 6 = Sikh --> excluded |
+|        | \hspace{.3cm} 7 = Muslim --> excluded |
+|        | \hspace{.3cm} 8 = Other --> excluded |
+| Religiosity | Apart from weddings and funerals, about how often do you attend religious services or rituals these days? |
+|        | \hspace{.3cm} 1 = Every day --> recoded to 7|
+|        | \hspace{.3cm} 2 = More than once a week --> recoded to 6|
+|        | \hspace{.3cm} 3 = Once a week --> recoded to 5|
+|        | \hspace{.3cm} 4 = Once a month --> recoded to 4|
+|        | \hspace{.3cm} 5 = Only on special holy days --> recoded to 3|
+|        | \hspace{.3cm} 6 = Once a year --> recoded to 2|
+|        | \hspace{.3cm} 7 = Never, practically never --> recoded to 1|
+| Pol. interest | How interested would you say you are in politics?|
+|        | \hspace{.3cm} 1 = Very interested --> recoded to 4|
+|        | \hspace{.3cm} 2 = Somewhat interested --> recoded to 3|
+|        | \hspace{.3cm} 3 = Not very interested --> recoded to 2|
+|        | \hspace{.3cm} 4 = Not at all interested --> recoded to 1|
+| Vote | If there were assembly elections today, who would you vote for?|
+|        | \hspace{.3cm} 1 = Democratic Unionist Party (DUP)|
+|        | \hspace{.3cm} 2 = Sinn Féin|
+|        | \hspace{.3cm} 3 = Ulster Unionist Party (UUP)|
+|        | \hspace{.3cm} 4 = Social Democratic and Labour Party (SDLP)|
+|        | \hspace{.3cm} 5 = Alliance Party|
+|        | \hspace{.3cm} 6 = Green Party|
+|        | \hspace{.3cm} 7 = Traditional Unionist Voice|
+|        | \hspace{.3cm} 8 = NI21|
+|        | \hspace{.3cm} 9 = UKIP|
+|        | \hspace{.3cm} 10 = Other|
+|        | \hspace{.3cm} 11 = I would not participate in the elections|
+| No Vote  | *Note: Recoded from Vote variable* |
+|        | \hspace{.3cm} 1 = No political participation; if no intention to vote or "I don't know" |
+|        | \hspace{.3cm} 0 = Political participation; if intention to vote for any of the political parties |
+| Reside  | Did you reside in Northern Ireland during The Troubles? |
+|        | \hspace{.3cm} 1 = Yes |
+|        | \hspace{.3cm} 2 = No --> recoded to 0|
+|        | \hspace{.3cm} 3 = Not applicable (not born yet) --> recoded to 0|
+| Exposure | Disregarding events like accidents, did you experience any of the following events during “the Troubles”? Were you / did you (have)\dots |
+|        | \hspace{.3cm} \dots displaced?|
+|        | \hspace{.3cm} \dots goods or property stolen?|
+|        | \hspace{.3cm} \dots house destroyed?|
+|        | \hspace{.3cm} \dots threatened with violence or death?|
+|        | \hspace{.3cm} \dots arbitrarily detained [detained without reason]?|
+|        | \hspace{.3cm} \dots attacked, beaten, tortured, or otherwise injured?|
+|        | \hspace{.3cm} \dots forced to commit violence?|
+|        | \hspace{.3cm} \dots victim of sexual violence?|
+|        | \hspace{.3cm} \dots witnessed violence?|
+|        | \hspace{.3cm} \dots family member displaced?|
+|        | \hspace{.3cm} \dots family member injured?|
+|        | \hspace{.3cm} \dots family member killed?|
+|        | \hspace{.3cm} \dots family member forcibly disappeared?|
+|        | \hspace{.3cm} \dots family member arbitrarily detained [detained without reason]?|
+|        | *Note: This list is further dichotomized.* |
+|        | \hspace{.3cm} 0 = Not exposed; if respondent answered "No" on incidents. |
+|        | \hspace{.3cm} 1 = Exposed; if respondent answered "Yes" on at least one incident. |
+| PTSD   | I am going to read you a list of problems that people sometimes have. For each one I am going to ask you how much you have experienced each one IN THE LAST MONTH, including today. |
+|        | ---Repeated, disturbing memories, thoughts, or images of a stressful experience from the past? |
+|        | ---Feeling very upset when something reminded you of a stressful experience from the past? |
+|        | ---Avoid activities or situations because they remind you of a stressful experience from the past? |
+|        | ---Feeling distant or cut off from other people? |
+|        | ---Feeling irritable or having angry outbursts? |
+|        | ---Having difficulty concentrating? |
+|        | *Note: All items were measured on a 5-point scale ranging from "1=Not at all" to "5=Extremely". A mean score is used in the analysis ($\alpha$ = .94)* |
+| Conflict   | People have different views on what caused “the Troubles.” |
+| narratives | I will now read a few statement about possible causes, or reasons, for the conflict, and I would like you to tell me how important you think each of them was. |
+| Cause_1 | ---Economic inequalities and poverty |
+| Cause_2 | ---Inequalities related to community background or religion |
+| Cause_3 | ---Government repression and discrimination |
+| Cause_4 | ---Lack of real democracy in Northern Ireland |
+| Cause_5 | ---Extremist Republicans |
+| Cause_6 | ---Extremist Loyalists |
+| Cause_7 | ---Illegitimate rule from Westminster |
+| Cause_8 | ---The partition of Ireland |
+|        | *Note: All items were measured on a 5-point scale ranging from "1=Very important" to "5=Not at all important". Reversed items are used in the analyses so a higher value entails higher importance attached to that particular conflict cause.* |
+| Future | If the UK leaves the EU, do you think Northern Ireland should \dots|
+|        | \hspace{.3cm} 1 = Remain part of the UK with devolved rule |
+|        | \hspace{.3cm} 2 = Remain part of the UK with direct rule |
+|        | \hspace{.3cm} 3 = Become an independent state |
+|        | \hspace{.3cm} 4 = Unify with the rest of Ireland |
+|        | \hspace{.3cm} 5 = Other [specify]: ______________ |
+|        | \hspace{.3cm} 88 = Don't know |
+|        | *Note: From this variable, we created three dummies:* |
+| Remain |  \hspace{.3cm} 1 = Remain part of the UK with devolved or direct rule |
+|        |  \hspace{.3cm} 0 =All else|
+| Independence |\hspace{.3cm} 1 = Become an independent state |
+|        |  \hspace{.3cm} 0 =All else|
+| Unification | \hspace{.3cm} 1 = Unify with the rest of Ireland |
+|        |  \hspace{.3cm} 0 =All else|
+
+Table: Additional Information on Used PAP Indicators
+
+
+```{r ptsd,include=FALSE}
+ptsd <- c("q411_1", "q411_2", "q411_3", "q411_4", "q411_5", "q411_6")
+PTSD <- Brexit[ptsd]
+psych::alpha(PTSD)
+```
+
+\newpage
+
+## A.3. Descriptive Statistics and Bivariate Correlations
+
+In the Table \ref{sumstats} below, we report the descriptive statistics for the covariates use to check the balance and, consequently, correct for imbalances. The descriptive statistics for the outcome variables are available in Table 1 in the main manuscript, whereas the correlation matrix between our variables of interest can be found in Table \ref{cortab}.
+
+\vspace{5mm}
+
+```{r sumstats, include=FALSE}
+sumstat <- Brexit %>%
+  
+  # Select and rename variables 
+  dplyr::select(
+    `Gender` = male,
+    `Age (in years)` = age,
+    `Level of education` = education,
+    `Employed (in %)` = employment_1,
+    `Living in a rural neighborhood (in %)` = rural,
+    `Religiosity` = religiosity,
+    `Community/Religion` = community,
+    `Political interest` = polinterest,
+    `Political participation (% non-voters)` = nonvote,
+    `Resided in NI during the Trouble (in %)` = reside,
+    `Exposure to violence (in %)` = exposure,
+    `Post-traumatic stress symptoms` = ptsd ) 
+
+sumtable(sumstat,
+         summ = list(
+           c('notNA(x)','mean(x)','sd(x)','min(x)','max(x)'),
+           c('notNA(x)','mean(x)')
+           ),
+         summ.names = list(
+           c('N','Mean','SD','Min','Max'),
+           c('Count','Percent')
+           ), out = "latex")
+```
+
+
+\begin{table}[!htbp] \centering 
+\caption{Summary Statistics}
+\label{sumstats} 
+\begin{tabular}{lccccc}
+\toprule
+\hline
+Variable & N & Mean & SD & Min & Max \\ 
+\hline
+Gender & 813 &  &  &  &  \\ 
+... Male & 431 & 53\% &  &  &  \\ 
+... Female & 382 & 47\% &  &  &  \\ 
+Age (in years) & 813 & 46.258 & 18.212 & 18 & 96 \\ 
+Level of education & 811 &  &  &  &  \\ 
+... Primary school or below & 40 & 4.9\% &  &  &  \\ 
+... Post-primary (year 8 to year 12) & 271 & 33.4\% &  &  &  \\ 
+... Post-primary (year 13-14/A level) & 136 & 16.8\% &  &  &  \\ 
+... Further education & 149 & 18.4\% &  &  &  \\ 
+... Higher education & 215 & 26.5\% &  &  &  \\ 
+Employed (in \%) & 811 & 0.508 & 0.5 & 0 & 1 \\ 
+Living in a rural neighborhood (in \%) & 813 & 0.423 & 0.494 & 0 & 1 \\ 
+Religiosity & 805 & 2.883 & 1.817 & 1 & 7 \\ 
+Community/Religion & 813 &  &  &  &  \\ 
+... Protestant & 405 & 49.8\% &  &  &  \\ 
+... Catholic & 352 & 43.3\% &  &  &  \\ 
+... None/other & 56 & 6.9\% &  &  &  \\ 
+Political interest & 811 & 2.153 & 1.008 & 1 & 4 \\ 
+Political participation (\% non-voters) & 813 & 0.332 & 0.471 & 0 & 1 \\ 
+Resided in NI during the Trouble (in \%) & 813 & 0.85 & 0.357 & 0 & 1 \\ 
+Exposure to violence (in \%) & 813 & 0.391 & 0.488 & 0 & 1 \\ 
+Post-traumatic stress symptoms & 811 & 1.248 & 0.649 & 1 & 5\\ 
+\hline
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+```{r corrmatrix, include=FALSE}
+corrmat <- Brexit %>%
+  dplyr::select(referendum, 
+                cause_1,cause_2,cause_3,cause_4,cause_5,cause_6,cause_7,cause_8,
+                unification, independence, remain)
+
+corstarsl <- function(x){ 
+require(Hmisc) 
+x <- as.matrix(x) 
+R <- rcorr(x)$r 
+p <- rcorr(x)$P 
+
+## define notions for significance levels; spacing is important.
+mystars <- ifelse(p < .001, "***", ifelse(p < .01, "** ", ifelse(p < .05, "* ", " ")))
+
+## truncate the matrix that holds the correlations to two decimal
+R <- format(round(cbind(rep(-1.11, ncol(x)), R), 2))[,-1] 
+
+## build a new matrix that includes the correlations with their appropriate stars 
+Rnew <- matrix(paste(R, mystars, sep=""), ncol=ncol(x)) 
+diag(Rnew) <- paste(diag(R), " ", sep="") 
+rownames(Rnew) <- colnames(x) 
+colnames(Rnew) <- paste(colnames(x), "", sep="") 
+
+## remove upper triangle
+Rnew <- as.matrix(Rnew)
+Rnew[upper.tri(Rnew, diag = TRUE)] <- ""
+Rnew <- as.data.frame(Rnew) 
+
+## remove last column and return the matrix (which is now a data frame)
+Rnew <- cbind(Rnew[1:length(Rnew)-1])
+return(Rnew) 
+}
+
+cortab <- corstarsl(corrmat)
+```
+
+
+```{r cortab, echo=FALSE, results='asis', message=FALSE}
+stargazer(cortab, type = "latex", summary = F, rownames = T, digits = 2, header = F,
+          float.env = "sidewaystable",
+          title = "Correlation Matrix between Variables of Interest",
+          label = "cortab")
+```
+
+\newpage
+
+# B. Testing Assumptions and Threats to Causal Identification
+
+## B.1. Balance between Pre- and Post-Brexit Groups
+
+Tables \ref{balance1} to \ref{balance4} asses whether there is any discontinuity with regards to key socio-demographic, political, and conflict-related variables. A significant post-Brexit dummy indicates that the respective variable significantly differs before and after the EU Referendum. In general, the sample is quite balanced across treatment and control groups when considering key socio-demographic (Table \ref{balance1}), political (Table \ref{balance2}), and conflict-related variables (Tables \ref{balance3}-\ref{balance4}). There are some exceptions, however. 
+
+First, older people were more likely to be interviewed before the EU referendum. As a result, the level of education and unemployment also differs between pre- and post-samples. Second, there are slightly more people in the pre-Brexit sample that indicated to have been exposed to violence during the troubles---which is probably also a result of the age imbalance. Following best practices in quasi-experimental studies, we include these variables in our models as they might confound our estimate of interest [@Keele2013; @Munoz2020]. Importantly, there is no imbalance between our pre- and post-groups regarding people's religious background, which was the main fault line of the conflict.
+
+\vspace{5mm}
+
+```{r, include=FALSE}
+#demographics
+gender <- glm(male ~ referendum, data = Brexit, family = "binomial")
+age <- lm(age ~ referendum, data = Brexit)
+education <- lm(as.numeric(education) ~ referendum, data = Brexit)
+employed <- glm(employment_1 ~ referendum, data = Brexit, family = "binomial")
+rural <- glm(rural ~ referendum, data = Brexit, family = "binomial")
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(gender, age, education, employed, rural,
+          dep.var.labels.include = F,
+          column.labels = c("Gender", "Age", "Education", "Employed", "Rural"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Balance Tests for Socio-Demographic Variables",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "balance1")
+```
+
+```{r, include=FALSE}
+#politics
+pol.interest <- lm(polinterest ~ referendum, data = Brexit)
+pol.participation <- glm(nonvote ~ referendum, data = Brexit, family = "binomial")
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(pol.interest, pol.participation,
+          dep.var.labels.include = F,
+          column.labels = c("Political Interest", "Political Participation"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Balance Tests for Political Variables",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "balance2")
+```
+
+```{r, include=FALSE}
+#conflict
+reside.conflict <- glm(reside ~ referendum, data = Brexit, family = "binomial")
+exposure <- glm(exposure ~ referendum, data = Brexit, family = "binomial")
+PTSD <- lm(ptsd ~ referendum, data = Brexit)
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(reside.conflict, exposure, PTSD,
+          dep.var.labels.include = F,
+          column.labels = c("Reside in NI\\\\ & During \\\\ & The Troubles", "Conflict Exposure", "PTSD"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Balance Tests for Conflict-Related Variables (I)",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "balance3")
+```
+
+
+```{r, include=FALSE}
+#religion (also tied to the conflict)
+religiosity <- lm(religiosity ~ referendum, data = Brexit)
+religion <- glm(as.factor(community) ~ referendum, data = Brexit, family = "binomial")
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(religiosity, religion,
+          dep.var.labels.include = F,
+          column.labels = c("Religiosity", "Catholics\\\\ & & (ref. protestants)"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Balance Tests for Conflict-Related Variables (II)",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "balance4")
+```
+\vspace{5mm}
+
+\newpage
+
+## B.2. Self-Selection into Control/Treatment Group
+
+In the main paper, we argue that it was not possible for respondents to self-select into the treatment or control condition because interview dates were set beforehand by the researchers irrespective of the referendum or respondent's characteristics. In addition, we posit that respondents could not have known the outcome in advance given the closeness of the polls. Figure \ref{fig:polls} corroborates this argument.  
+
+\vspace{3mm}
+
+```{r include=FALSE}
+#load and clean the data
+brexit_polls <- import("Data/Brexit_Polls.Rdata") %>%
+  gather(vote, share, remain:undecided) %>%
+  filter(date > as.Date("2016-04-14") & vote != "undecided")
+```
+
+
+```{r, echo=FALSE, fig.height = 3, fig.width=6, fig.cap="\\label{fig:polls}Poll results leading up to the referendum. <br> Note: This Figure is made using the replication data and code kindly shared by Resul Umit (see https://osf.io/vzcrf/)", results='asis', message=FALSE}
+ggplot(brexit_polls,  
+       aes(x= date, y= share)) +
+  geom_point(aes(colour = vote), size = 2) +
+  geom_hline(yintercept = 50, linetype = "longdash") +
+  geom_smooth(aes(colour = vote, fill = vote),
+              method = 'loess', formula = 'y ~ x') +
+  theme_bw() +
+  theme(legend.position = "right",
+        legend.title = element_blank(),
+        axis.title = element_blank(),
+        axis.text = element_text(size = 10)) +
+  labs(x = "", y = "") +
+  scale_colour_viridis(name = "",
+                       option = "E",
+                       breaks = c("leave", "remain"),
+                       labels = c("Leave", "Remain"), discrete = TRUE) +
+  scale_fill_viridis(name = "",
+                     option = "E",
+                     breaks = c("leave", "remain"),
+                     labels = c("Leave", "Remain"), discrete = TRUE) +
+  scale_x_date(breaks = as.Date(c("2016-05-01", "2016-05-15", "2016-06-01", "2016-06-15")), 
+               date_labels = "%d %b") +
+  scale_y_continuous(breaks = 50,
+                     labels = "50%")
+```
+
+\vspace{5cm}
+
+
+## B.3. Selective Attrition
+
+The key identifying assumption of temporal ignorability [i.e., the potential outcomes must be independent from the moment of the interview; see @Munoz2020] could be violated if respondents become more (or less) willing to answer our dependent variables after knowing the EU referendum result (i.e., selective attrition). We measured attrition by counting the number of missing values on all outcome variables used. As Table \ref{attrition} shows, differences in attrition are statistically insignificant.
+
+```{r, include=FALSE}
+#attrition
+attrition <- lm(causes_missing ~ referendum, data = Brexit)
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(attrition,
+          dep.var.labels.include = F,
+          column.labels = c("Number of Missings\\\\ & on Outcome Variable"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Test of Attrition",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "attrition")
+```
+
+
+
+## B.4. Placebo Outcome Test
+
+To further increase the confidence in our results, we conducted a placebo outcome test. That is, we replaced the outcome variable by an item which should not be substantially affected by the Brexit outcome. For this test, we have selected respondents' self-assessment of their physical health measured with the following question: *Thinking about your general physical health [illness, injury], how would you describe your overall physical health today?*. We believe it is virtually impossible to identify a plausible relationship between the Brexit outcome and physical illness/injuries. As a result, a significant post-Brexit dummy using physical health as the outcome variable suggests we might be picking up a spurious relationship. Table \ref{placebo}, however, confirms that the treatment effect is insignificant for the placebo outcome variable.
+
+
+```{r, include=FALSE}
+#placebo outcome
+placebo.outcome <- lm(q611 ~ referendum, data = Brexit)
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(placebo.outcome,
+          dep.var.labels.include = F,
+          column.labels = c("Physical Health"),
+          covariate.labels = "Brexit", 
+          model.numbers = F,
+          title="Placebo Outcome Test",
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "placebo")
+```
+
+
+\newpage
+
+# C. Numerical Results
+
+On the pages below, we report all numerical results corresponding to 
+
+\begin{itemize}
+\item Figure 1 (see Section C.1), 
+\item Figure 3 (see Section C.2), 
+\item Figure 4 (see Section C.3), 
+\item Figure 5 (see Section C.4), 
+\item and to the results on the causal mediation analysis (see Section C.5).
+\end{itemize}
+
+\newpage
+\newpage
+
+
+## C.1. Numerical Results Corresponding to Figure 1
+\vspace{-5mm}
+
+```{r, include=FALSE}
+## Three model specifications
+#models with controls or weights (to fix unbalance)
+right.side.c <- "~ referendum + age + employment_1 + exposure"
+varlabels <- c("Brexit", "Age", "Employed", "Conflict Exposure")
+
+#models without controls
+right.side.nc <- "~ referendum"
+varlabels.nc <- "Brexit"
+
+#models with entropy matching
+W.out <- weightit(referendum ~ age + employment_1 + exposure,
+                  data = Brexit, estimand = "ATT", method = "ebal") #create weights
+summary(W.out)
+```
+
+
+```{r, include=FALSE}
+#### 1. ATEs: Economic and political causes ####
+
+rootcauses <- Cs(cause_1,cause_2,cause_3,cause_4)
+
+
+ate.rc.em <- vector(length(rootcauses), mode = "list")
+names(ate.rc.em) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.em[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit, weights = W.out$w), #use weights
+                                                list(.modelformula = modelformula)))
+
+  print(summary(ate.rc.em[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.em[[rootcauses[i]]])) #including CIs
+}
+
+
+#model with controls
+ate.rc.c <- vector(length(rootcauses), mode = "list")
+names(ate.rc.c) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.rc.c[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit), 
+                                        list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.c[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.c[[rootcauses[i]]])) #including CIs
+  
+}
+
+#model without controls or matching
+ate.rc.nc <- vector(length(rootcauses), mode = "list")
+names(ate.rc.nc) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.nc[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.nc[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.nc[[rootcauses[i]]])) #including CIs
+  
+}
+
+
+#### 2. ATEs: Actor-based causes ####
+
+actorcauses <- Cs(cause_5,cause_6,cause_7,cause_8)
+
+#model with entropy matching
+ate.ac.em <- vector(length(actorcauses), mode = "list")
+names(ate.ac.em) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.em[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit, weights = W.out$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.em[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.em[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model with controls
+ate.ac.c <- vector(length(actorcauses), mode = "list")
+names(ate.ac.c) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.ac.c[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.c[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.c[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model without controls
+ate.ac.nc <- vector(length(actorcauses), mode = "list")
+names(ate.ac.nc) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.nc[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit), 
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.nc[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.nc[[actorcauses[i]]])) #including CIs
+  
+}
+```
+
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(ate.rc.nc$cause_1, ate.rc.c$cause_1, ate.rc.em$cause_1,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Economic Inequality and Poverty as a Conflict Cause",
+          dep.var.caption = "Economic Inequality and Poverty",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Matching"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause1",          
+          star.char = c("+", "*", "**", "***"),
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.rc.nc$cause_2, ate.rc.c$cause_2, ate.rc.em$cause_2,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Community/Religious Inequality as a Conflict Cause",
+          dep.var.caption = "Community/Religious Inequality",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause2",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.rc.nc$cause_3, ate.rc.c$cause_3, ate.rc.em$cause_3,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Discrimination and Repression as a Conflict Cause",
+          dep.var.caption = "Discrimination and Repression",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause3",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.rc.nc$cause_4, ate.rc.c$cause_4, ate.rc.em$cause_4,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Lack of Democracy as a Conflict Cause",
+          dep.var.caption = "Lack of Democracy",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause4",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.ac.nc$cause_5, ate.ac.c$cause_5, ate.ac.em$cause_5,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Extremist Republicans as a Conflict Cause",
+          dep.var.caption = "Extremist Republicans",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause5",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.ac.nc$cause_6, ate.ac.c$cause_6, ate.ac.em$cause_6,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Extremist Loyalists as a Conflict Cause",
+          dep.var.caption = "Extremist Loyalists",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause6",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.ac.nc$cause_7, ate.ac.c$cause_7, ate.ac.em$cause_7,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving a Illegitimate Rule of Westminster as a Conflict Cause",
+          dep.var.caption = "Illegitimate Rule of Westminster",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause7",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.ac.nc$cause_8, ate.ac.c$cause_8, ate.ac.em$cause_8,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Perceiving `The Partition of Ireland' as a Conflict Cause",
+          dep.var.caption = "Partitioning of Ireland",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          ci = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.cause8",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+```
+
+
+\newpage
+\newpage
+
+## C.2. Numerical Results Corresponding to Figure 3
+
+```{r, include=FALSE}
+#### 3. ATEs: Preferences for the Future ####
+
+future <- Cs(remain,independence, unification)
+
+#model with entropy matching
+ate.f.em <- vector(length(future), mode = "list")
+names(ate.f.em) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.em[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit, weights = W.out$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.em[[future[i]]]))
+  
+}
+
+#model with controls
+ate.f.c <- vector(length(future), mode = "list")
+names(ate.f.c) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.c)
+  print(modelformula)
+  
+  ate.f.c[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit), 
+                                              list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.c[[future[i]]]))
+  
+}
+
+#model without controls
+ate.f.nc <- vector(length(future), mode = "list")
+names(ate.f.nc) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.nc[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit),  
+                                                 list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.nc[[future[i]]]))
+  
+}
+```
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(ate.f.nc$remain, ate.f.c$remain, ate.f.em$remain,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Prefering to Remain in the UK after Brexit",
+          dep.var.caption = "Remain Part of the UK",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.remain",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.f.nc$independence, ate.f.c$independence, ate.f.em$independence,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Prefering to Become Independent after Brexit",
+          dep.var.caption = "Become an Independent State",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.independence",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+
+
+stargazer(ate.f.nc$unification, ate.f.c$unification, ate.f.em$unification,
+          covariate.labels = varlabels, 
+          title="Effect of Brexit on Prefering to Unify with Ireland after Brexit",
+          dep.var.caption = "Unify with the Rest of Ireland",
+          dep.var.labels.include = FALSE,
+          model.numbers = T,
+          add.lines = list(c("Correction for Imbalances?", "None", "Covariates", "Entropy"),
+                           c("", "", "", "Matching")),
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "ate.unify",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F)
+```
+
+
+\newpage
+## C.3. Numerical Results Corresponding to Figure 4
+
+```{r, include=FALSE}
+
+#### 1. RDDs: Economic and political causes ####
+
+# Cause 1: Economic inequalities and poverty
+Brexit.1 <- Brexit %>% drop_na(cause_1, employment_1)
+W.out.1 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.1, estimand = "ATT", method = "ebal") #create weights
+econ.rdd = lm(cause_1 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.1,
+              weights = W.out.1$w)
+
+# Cause 2: Community or Religious Inequalities
+Brexit.2 <- Brexit %>% drop_na(cause_2, employment_1)
+W.out.2 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.2, estimand = "ATT", method = "ebal") #create weights
+comm.rdd = lm(cause_2 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.2,
+              weights = W.out.2$w)
+
+# Cause 3: Government repression and discrimination
+Brexit.3 <- Brexit %>% drop_na(cause_3, employment_1)
+W.out.3 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.3, estimand = "ATT", method = "ebal") #create weights
+disc.rdd = lm(cause_3 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.3,
+              weights = W.out.3$w)
+
+# Cause 4: Lack of real democracy in NI
+Brexit.4 <- Brexit %>% drop_na(cause_4, employment_1)
+W.out.4 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.4, estimand = "ATT", method = "ebal") #create weights
+dem.rdd = lm(cause_4 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.4,
+              weights = W.out.4$w)
+
+
+#### 2. RDDs: Actor-based causes ####
+
+# Cause 5: Extremist Republicans
+Brexit.5 <- Brexit %>% drop_na(cause_5, employment_1)
+W.out.5 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.5, estimand = "ATT", method = "ebal") #create weights
+rep.rdd = lm(cause_5 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.5,
+             weights = W.out.5$w)
+
+# Cause 6: Extremist Loyalists
+Brexit.6 <- Brexit %>% drop_na(cause_6, employment_1)
+W.out.6 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.6, estimand = "ATT", method = "ebal") #create weights
+loy.rdd = lm(cause_6 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.6,
+             weights = W.out.6$w)
+
+# Cause 7: Illegitimate rule from Westminster
+Brexit.7 <- Brexit %>% drop_na(cause_7, employment_1)
+W.out.7 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.7, estimand = "ATT", method = "ebal") #create weights
+ill.rdd = lm(cause_7 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.7,
+             weights = W.out.7$w)
+
+# Cause 8: The partition of Ireland
+Brexit.8 <- Brexit %>% drop_na(cause_8, employment_1)
+W.out.8 <- weightit(referendum ~ age + employment_1 + exposure,
+                    data = Brexit.8, estimand = "ATT", method = "ebal") #create weights
+part.rdd = lm(cause_8 ~ time_zero+referendum+(time_zero*referendum), data = Brexit.8,
+             weights = W.out.8$w)
+```
+
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(econ.rdd, comm.rdd, disc.rdd, dem.rdd,
+          covariate.labels = c("Campaign", "Brexit", "Campaign*Brexit"), 
+          title="Regression Discontinuity Estimates for Perceptions of Conflict Causes I",
+          model.numbers = F,
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "rdd.causes.1",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001", "Entropy matching applied."),
+          notes.append = F)
+
+
+stargazer(rep.rdd, loy.rdd, ill.rdd, part.rdd,
+          covariate.labels = c("Campaign", "Brexit", "Campaign*Brexit"), 
+          title="Regression Discontinuity Estimates for Perceptions of Conflict Causes II",
+          model.numbers = F,
+          omit.stat = c("ser", "f"),
+          type='latex',         
+          header=FALSE,
+          font.size = "small",
+          label = "rdd.causes.2",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001", "Entropy matching applied."),
+          notes.append = F)
+```
+
+
+\newpage
+## C.4. Numerical Results Corresponding to Figure 5
+
+```{r, include=FALSE}
+unification.rdd = lm(unification ~ time_zero+referendum+(time_zero*referendum), data = Brexit,
+              weights = W.out$w)
+remain.rdd = lm(remain ~ time_zero+referendum+(time_zero*referendum), data = Brexit,
+              weights = W.out$w)
+```
+
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(unification.rdd, remain.rdd,
+          covariate.labels = c("Campaign", "Brexit", "Campaign*Brexit"), 
+          title="Regression Discontinuity Estimates for Future Preferences",
+          omit.stat = c("ser", "f"),
+          type='latex',
+          align = T,
+          header=FALSE,
+          font.size = "small",
+          label = "rdd.future",
+          star.cutoffs = c(.05, .01, .001),
+          notes = c("* p<0.05; ** p<0.01; *** p<0.001", "Entropy matching applied."),
+          notes.append = F)
+```
+
+
+\newpage
+## C.5. Results of the Average Causal Mediation Effects
+```{r, include=FALSE}
+cor_apa <- capture.output(cor_apa(cor.test(Brexit$cause_7, Brexit$cause_8), format = "rmarkdown"))
+```
+
+In what follows, we fit mediation models for the two conflict causes found to be changed by Brexit in the first step of our analysis. As both causes are correlated to a significant extent `r cor_apa`, we fit both mediation models separately. For fitting of the mediation models, we closely follow Imai et al. [-@Imai2010; -@Imai2013] and for the sake of transparency, we have also printed the corresponding R scripts below.
+
+In the first step, we apply a linear regression fit with least squares for the mediator variables and a probit regression for the dichotomous outcomes. We include the same pre-treatment covariates as before to correct for imbalances. 
+
+```{r}
+### Cause_8: Partitioning of Ireland ###
+cause.8.fit <- lm(cause_8 ~ referendum + age + employment_1 + exposure, 
+                  data = Brexit) #cause_8 mediator
+unify.8.fit <- glm(unification ~ cause_8 + referendum + age + employment_1 + exposure,
+                   data = Brexit, family = binomial("probit")) #unification outcome
+remain.8.fit <- glm(remain ~ cause_8 + referendum + age + employment_1 + exposure,
+                    data = Brexit, family = binomial("probit")) #remain outcome
+
+### Cause_7: Illegitimate rule of Westminster ###
+cause.7.fit <- lm(cause_7 ~ referendum + age + employment_1 + exposure,
+                  data = Brexit) #cause_7 mediator
+unify.7.fit <- glm(unification ~ cause_7 + referendum + age + employment_1 + exposure, 
+                   data = Brexit, family = binomial("probit")) #unification outcome
+remain.7.fit <- glm(remain ~ cause_7 + referendum + age + employment_1 + exposure,
+                    data = Brexit, family = binomial("probit")) #remain outcome
+```
+
+In the second step, we use the ***mediate*** function to estimate the Average Causal Mediation Effects and Average Direct Effects. We use the default of 1000 simulations to calculate the uncertainty estimates.
+
+```{r}
+### Cause_8: Partitioning of Ireland ###
+cause.8.unify <- mediate(cause.8.fit, unify.8.fit, 
+                         treat = "referendum", mediator = "cause_8",
+                         robustSE = TRUE, sims = 1000)
+cause.8.remain <- mediate(cause.8.fit, remain.8.fit, 
+                          treat = "referendum", mediator = "cause_8",
+                          robustSE = TRUE, sims = 1000)
+
+### Cause_7: Illegitimate rule of Westminster ###
+cause.7.unify <- mediate(cause.7.fit, unify.7.fit, 
+                         treat = "referendum", mediator = "cause_7",
+                         robustSE = TRUE, sims = 1000)
+cause.7.remain <- mediate(cause.7.fit, remain.7.fit, 
+                          treat = "referendum", mediator = "cause_7",)
+```
+
+As one can see below, all estimated ACMEs are statistically significantly different from zero. In addition, the estimated average direct and total effects are also statistically significantly different from zero. These results suggest that Brexit may have activated particular conflict narratives, which in turn made citizens more likely to favor unify with the rest of Ireland at the expense of remaining part of the UK. However, over and beyond the conflict narratives, other mediators are still at play. Finally, since both outcomes are binary all estimated effects are expressed as the increase in probability that the respondents favors unify or remaining in the UK, respectively.
+
+```{r ACME results}
+summary(cause.8.unify)
+summary(cause.8.remain)
+summary(cause.7.unify)
+summary(cause.7.remain)
+```
+
+
+\newpage
+
+# D. Additional Analyses
+
+## D.1. Applying Listwise Deletion
+
+In the models in the main paper, we decided to not use listwise deletion given that non-response on our outcome measures was relatively high, especially when combined. As a result, applying listwise deletion entails discarding many valid responses. This not only leads to the loss of valuable information, but also increases the likelihood of selection bias [@King2001]. By including as many respondents as possible, we reduce such bias within each model while simultaneously increasing power. Nevertheless, we replicate Figures 1 and 3 of the main manuscript but now applying listwise deletion. Figures \ref{fig:lwrobust1} and \ref{fig:lwrobust3} show that this does not affect the substantive meaning of the results reported in the main text.
+
+
+```{r code lw robust Figure 1, include=FALSE}
+# Subset the data
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Brexit.lw  <- Brexit %>% dplyr::select(age, employment_1, exposure, #failed balance tests
+                                   referendum, #referendum indicator
+                                   cause_1,cause_2,cause_3,cause_4,cause_5,cause_6,cause_7,cause_8, #DVs 1 (med.)
+                                   remain, independence, unification)  %>% #DVs 2 
+  drop_na()
+
+summary(Brexit.lw)
+
+
+# Re-run the exact same code on the subsample
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Three model specifications
+#models with controls or weights (to fix unbalance)
+right.side.c <- "~ referendum + age + employment_1 + exposure"
+varlabels <- c("Brexit", "Age", "Employed", "Conflict Exposure")
+
+#models without controls
+right.side.nc <- "~ referendum"
+varlabels.nc <- "Brexit"
+
+#models with entropy matching
+W.out.lw <- weightit(referendum ~ age + employment_1 + exposure,
+                  data = Brexit.lw, estimand = "ATT", method = "ebal") #create weights
+summary(W.out.lw)
+
+
+#### Economic and political causes ####
+
+rootcauses <- Cs(cause_1,cause_2,cause_3,cause_4)
+
+
+ate.rc.em <- vector(length(rootcauses), mode = "list")
+names(ate.rc.em) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.em[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw, weights = W.out.lw$w), #use weights
+                                                list(.modelformula = modelformula)))
+
+  print(summary(ate.rc.em[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.em[[rootcauses[i]]])) #including CIs
+}
+
+
+#model with controls
+ate.rc.c <- vector(length(rootcauses), mode = "list")
+names(ate.rc.c) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.rc.c[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw), 
+                                        list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.c[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.c[[rootcauses[i]]])) #including CIs
+  
+}
+
+#model without controls or matching
+ate.rc.nc <- vector(length(rootcauses), mode = "list")
+names(ate.rc.nc) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.nc[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.nc[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.nc[[rootcauses[i]]])) #including CIs
+  
+}
+
+
+#### Actor-based causes ####
+
+actorcauses <- Cs(cause_5,cause_6,cause_7,cause_8)
+
+#model with entropy matching
+ate.ac.em <- vector(length(actorcauses), mode = "list")
+names(ate.ac.em) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.em[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw, weights = W.out.lw$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.em[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.em[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model with controls
+ate.ac.c <- vector(length(actorcauses), mode = "list")
+names(ate.ac.c) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.ac.c[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.c[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.c[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model without controls
+ate.ac.nc <- vector(length(actorcauses), mode = "list")
+names(ate.ac.nc) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.nc[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw), 
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.nc[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.nc[[actorcauses[i]]])) #including CIs
+  
+}
+
+
+####### Figure 1: Preparations ########  
+
+### Get b's and ci's for rootcauses
+cis.rc.em <- matrix(NA,length(rootcauses),2)
+b.rc.em <- matrix(NA,length(rootcauses),1)
+cis.rc.c <- matrix(NA,length(rootcauses),2)
+b.rc.c <- matrix(NA,length(rootcauses),1)
+cis.rc.nc <- matrix(NA,length(rootcauses),2)
+b.rc.nc <- matrix(NA,length(rootcauses),1)
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.em[i] <- ate.rc.em[[i]]$coefficients[2]
+  ci.rc.em <- confint(ate.rc.em[[i]])
+  print(b.rc.em[i])
+  lb.rc.em <- ci.rc.em[2,1]
+  ub.rc.em <- ci.rc.em[2,2]
+  cis.rc.em[i,] <- cbind(lb.rc.em,ub.rc.em)
+}
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.c[i] <- ate.rc.c[[i]]$coefficients[2]
+  ci.rc.c <- confint(ate.rc.c[[i]])
+  print(b.rc.c[i])
+  lb.rc.c <- ci.rc.c[2,1]
+  ub.rc.c <- ci.rc.c[2,2]
+  cis.rc.c[i,] <- cbind(lb.rc.c,ub.rc.c)
+}
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.nc[i] <- ate.rc.nc[[i]]$coefficients[2]
+  ci.rc.nc <- confint(ate.rc.nc[[i]])
+  print(b.rc.nc[i])
+  lb.rc.nc <- ci.rc.nc[2,1]
+  ub.rc.nc <- ci.rc.nc[2,2]
+  cis.rc.nc[i,] <- cbind(lb.rc.nc,ub.rc.nc)
+}
+
+### Get b's and ci's for actor causes
+cis.ac.em <- matrix(NA,length(actorcauses),2)
+b.ac.em <- matrix(NA,length(actorcauses),1)
+cis.ac.c <- matrix(NA,length(actorcauses),2)
+b.ac.c <- matrix(NA,length(actorcauses),1)
+cis.ac.nc <- matrix(NA,length(actorcauses),2)
+b.ac.nc <- matrix(NA,length(actorcauses),1)
+
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.em[i] <- ate.ac.em[[i]]$coefficients[2]
+  ci.ac.em <- confint(ate.ac.em[[i]])
+  print(b.ac.em[i])
+  lb.ac.em <- ci.ac.em[2,1]
+  ub.ac.em <- ci.ac.em[2,2]
+  cis.ac.em[i,] <- cbind(lb.ac.em,ub.ac.em)
+}
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.c[i] <- ate.ac.c[[i]]$coefficients[2]
+  ci.ac.c <- confint(ate.ac.c[[i]])
+  print(b.ac.c[i])
+  lb.ac.c <- ci.ac.c[2,1]
+  ub.ac.c <- ci.ac.c[2,2]
+  cis.ac.c[i,] <- cbind(lb.ac.c,ub.ac.c)
+}
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.nc[i] <- ate.ac.nc[[i]]$coefficients[2]
+  ci.ac.nc <- confint(ate.ac.nc[[i]])
+  print(b.ac.nc[i])
+  lb.ac.nc <- ci.ac.nc[2,1]
+  ub.ac.nc <- ci.ac.nc[2,2]
+  cis.ac.nc[i,] <- cbind(lb.ac.nc,ub.ac.nc)
+}
+
+### Specify y-labs and labels: rootcauses
+y.lab <- seq(from = 1, to=length(rootcauses),by=1)
+rc.vnames <-c(causes_1 = "Economic inequality\n and poverty",
+              causes_2 = "Community-based,\n inequality", 
+              causes_3 = "Discrimination\n and repression",
+              causes_4 = "Lack of Democracy")
+
+### Specify y-labs and labels: actorcauses
+y.lab <- seq(from = 1, to=length(actorcauses),by=1)
+ac.vnames <-c(causes_5 = "Extremist\n Republicans",
+              causes_6 = "Extremist\n Loyalists",
+              causes_7 = "Illegitimate rule\n from Westminster",
+              causes_8 = "Partition of Ireland")
+
+### Jitter to position coefficients
+jitter.c <-  -0.15
+jitter.nc <-  -0.30
+```
+
+
+```{r plot lw robust Figure 1, echo=FALSE, fig.height = 4, fig.width=6.5, fig.cap="\\label{fig:lwrobust1}Replication of Figure 1, Applying Listwise Deletion", results='asis', message=FALSE, warning=FALSE}
+### Set margins
+par(mfrow=c(1,2), mar = c(5, 4, 0, 2), oma = c(0.5, 3.5, 0, 0), mgp=c(2,0.5,0))
+
+### PLOT 1 ### 
+plot(b.rc.c, y.lab, 
+     type="n", 
+     ylab ="", xlab = "", yaxt="n", 
+     xlim = c(-0.6,0.6), ylim = c(0.5,4.5),
+     cex.axis=0.75)
+axis(2, at=y.lab, labels=rc.vnames, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.8)
+#b[CI]s: entropy weights
+points(b.rc.em, y.lab, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.rc.em[,1], y.lab, cis.rc.em[,2], y.lab, lty=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.rc.c, y.lab+jitter.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.rc.c[,1], y.lab+jitter.c, cis.rc.c[,2], y.lab+jitter.c, lty=2, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.rc.nc, y.lab+jitter.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.rc.nc[,1], y.lab+jitter.nc, cis.rc.nc[,2], y.lab+jitter.nc, lty=4, lwd=1, col = "grey50")
+abline(v=0)
+
+### Set margins
+par(mar = c(5, 5, 0, 0.5))
+
+### PLOT 2 ### 
+plot(b.ac.c, y.lab, type="n", ylab ="", xlab = "", yaxt="n", xlim = c(-0.6,0.6), ylim = c(0.5,4.5), 
+     cex.axis=0.75)
+axis(2, at=y.lab, labels=ac.vnames, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.8)
+#b[CI]s: entropy weights
+points(b.ac.em, y.lab, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.ac.em[,1], y.lab, cis.ac.em[,2], y.lab, lty=1, cex=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.ac.c, y.lab+jitter.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.ac.c[,1], y.lab+jitter.c, cis.ac.c[,2], y.lab+jitter.c, lty=2, cex=1, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.ac.nc, y.lab+jitter.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.ac.nc[,1], y.lab+jitter.nc, cis.ac.nc[,2], y.lab+jitter.nc, lty=4, cex=1, lwd=1, col = "grey50")
+abline(v=0)
+
+### Settings to print legend to the device region
+par(xpd=NA)
+
+### LEGEND ### 
+legend(x=-2.3, y=-0.65, horiz = T, cex = 0.7,
+       legend=c("Matching", "Covariates", "No Correction"), 
+       title = "Applied correction for imbalance", 
+       lty = c(1,2,4), col=c("black", "grey20", "grey50"), pch=c(21,4,6))
+```
+
+```{r code lw robust Figure 3, include=FALSE}
+#### Preferences for the Future ####
+
+future <- Cs(remain,independence, unification)
+
+#model with entropy matching
+ate.f.em <- vector(length(future), mode = "list")
+names(ate.f.em) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.em[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw, weights = W.out.lw$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.em[[future[i]]]))
+  
+}
+
+#model with controls
+ate.f.c <- vector(length(future), mode = "list")
+names(ate.f.c) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.c)
+  print(modelformula)
+  
+  ate.f.c[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw), 
+                                              list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.c[[future[i]]]))
+  
+}
+
+#model without controls
+ate.f.nc <- vector(length(future), mode = "list")
+names(ate.f.nc) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.nc[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.lw),  
+                                                 list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.nc[[future[i]]]))
+  
+}
+
+
+####### Figure 3: Preparations ########  
+
+### Get b's and ci's for preferences for the future
+cis.f.em <- matrix(NA,length(future),2)
+b.f.em <- matrix(NA,length(future),1)
+cis.f.c <- matrix(NA,length(future),2)
+b.f.c <- matrix(NA,length(future),1)
+cis.f.nc <- matrix(NA,length(future),2)
+b.f.nc <- matrix(NA,length(future),1)
+
+
+for (i in 1:length(future))
+{
+  b.f.em[i] <- ate.f.em[[i]]$coefficients[2]
+  ci.f.em <- confint(ate.f.em[[i]])
+  print(b.f.em[i])
+  lb.f.em <- ci.f.em[2,1]
+  ub.f.em <- ci.f.em[2,2]
+  cis.f.em[i,] <- cbind(lb.f.em,ub.f.em)
+}
+
+for (i in 1:length(future))
+{
+  b.f.c[i] <- ate.f.c[[i]]$coefficients[2]
+  print(ate.f.c[[i]]$coefficients[2])
+  ci.f.c <- confint(ate.f.c[[i]])
+  #print(ci)
+  lb.f.c <- ci.f.c[2,1]
+  ub.f.c <- ci.f.c[2,2]
+  cis.f.c[i,] <- cbind(lb.f.c,ub.f.c)
+}
+
+for (i in 1:length(future))
+{
+  b.f.nc[i] <- ate.f.nc[[i]]$coefficients[2]
+  ci.f.nc <- confint(ate.f.nc[[i]])
+  print(b.f.nc[i])
+  lb.f.nc <- ci.f.nc[2,1]
+  ub.f.nc <- ci.f.nc[2,2]
+  cis.f.nc[i,] <- cbind(lb.f.nc,ub.f.nc)
+}
+
+### Specify y-labs and labels: future preferences
+y.lab.f <- seq(from = 1, to=length(future),by=1)
+vnames.f <-c(remain = "Remain Part\n of the UK",
+              independence = "Become an\n Independent State",
+              unification = "Unify with the\n Rest of Ireland")
+
+### Jitter to position coefficients
+jitter.f.c <-  -0.15
+jitter.f.nc <-  -0.30
+```
+
+
+```{r plot lw robust Figure 3, echo=FALSE, fig.height = 4.5, fig.width=4.5, fig.cap="\\label{fig:lwrobust3}Replication of Figure 3, Applying Listwise Deletion", results='asis', message=FALSE, warning=FALSE}
+### Set margins
+par(mfrow=c(1,1), mar=c(5, 4, 0, 3), oma=c(0.5, 3.5,0.5,0.2), mgp=c(2,0.8,0))
+
+### PLOT 3
+plot(b.f.c, y.lab.f, type="n", ylab ="", xlab = "", yaxt="n", 
+     xlim = c(-0.4,0.4), ylim = c(0.5,3.5),
+     cex.axis=0.75)
+axis(2, at=y.lab.f, labels=vnames.f, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.85)
+#b[CI]s: entropy weights
+points(b.f.em, y.lab.f, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.f.em[,1], y.lab.f, cis.f.em[,2], y.lab.f, lty=1, cex=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.f.c, y.lab.f+jitter.f.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.f.c[,1], y.lab.f+jitter.f.c, cis.f.c[,2], y.lab.f+jitter.f.c, lty=2, cex=1, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.f.nc, y.lab.f+jitter.f.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.f.nc[,1], y.lab.f+jitter.f.nc, cis.f.nc[,2], y.lab.f+jitter.f.nc, lty=4, cex=1, lwd=1, col = "grey50")
+abline(v=0)
+
+
+### Settings to print legend to the device region
+par(xpd=NA)
+
+### LEGEND ### 
+legend(x=-0.588, y=-0.25, horiz = T, cex = 0.7,
+       legend=c("Matching", "Covariates", "No Correction"), 
+       title = "Applied correction for imbalance", 
+       lty = c(1,2,4), col=c("black", "grey20", "grey50"), pch=c(21,4,6))
+```
+
+
+\newpage
+
+## D.2. Excluding Respondents Interviewed on June 23
+
+In the models in the main paper, the individuals interviewed on the day of the EU referendum are included in the control condition. Below, we replicate Figures 1 and 3 of the main manuscript but now excluding those respondents given particularities of the Referendum day. Figures \ref{fig:refrobust1} and \ref{fig:refrobust3} show that this does not affect the substantive meaning of the results reported in the main text.
+
+
+```{r code ref robust Figure 1, include=FALSE}
+# Subset the data
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+summary(as.factor(Brexit$referendum))
+summary(as.factor(Brexit$referendum2))
+
+#delete respondents interviewed on day of the referendum to control
+Brexit.ref <- subset(Brexit, referendum2 != 1)
+summary(as.factor(Brexit.ref$referendum))
+summary(as.factor(Brexit.ref$referendum2))
+
+
+# Re-run the exact same code on the subsample
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## Three model specifications
+#models with controls or weights (to fix unbalance)
+right.side.c <- "~ referendum + age + employment_1 + exposure"
+varlabels <- c("Brexit", "Age", "Employed", "Conflict Exposure")
+
+#models without controls
+right.side.nc <- "~ referendum"
+varlabels.nc <- "Brexit"
+
+#models with entropy matching
+W.out.ref <- weightit(referendum ~ age + employment_1 + exposure,
+                  data = Brexit.ref, estimand = "ATT", method = "ebal") #create weights
+summary(W.out.ref)
+
+
+#### Economic and political causes ####
+
+rootcauses <- Cs(cause_1,cause_2,cause_3,cause_4)
+
+
+ate.rc.em <- vector(length(rootcauses), mode = "list")
+names(ate.rc.em) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.em[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref, weights = W.out.ref$w), #use weights
+                                                list(.modelformula = modelformula)))
+
+  print(summary(ate.rc.em[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.em[[rootcauses[i]]])) #including CIs
+}
+
+
+#model with controls
+ate.rc.c <- vector(length(rootcauses), mode = "list")
+names(ate.rc.c) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.rc.c[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref), 
+                                        list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.c[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.c[[rootcauses[i]]])) #including CIs
+  
+}
+
+#model without controls or matching
+ate.rc.nc <- vector(length(rootcauses), mode = "list")
+names(ate.rc.nc) <- rootcauses
+
+for (i in 1:(length(rootcauses))){
+  
+  modelformula <- paste(rootcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.rc.nc[[rootcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.rc.nc[[rootcauses[i]]])) #print results,
+  print(confint(ate.rc.nc[[rootcauses[i]]])) #including CIs
+  
+}
+
+
+#### Actor-based causes ####
+
+actorcauses <- Cs(cause_5,cause_6,cause_7,cause_8)
+
+#model with entropy matching
+ate.ac.em <- vector(length(actorcauses), mode = "list")
+names(ate.ac.em) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.em[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref, weights = W.out.ref$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.em[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.em[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model with controls
+ate.ac.c <- vector(length(actorcauses), mode = "list")
+names(ate.ac.c) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.c)
+  print(modelformula)
+  
+  ate.ac.c[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref), 
+                                             list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.c[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.c[[actorcauses[i]]])) #including CIs
+  
+}
+
+#model without controls
+ate.ac.nc <- vector(length(actorcauses), mode = "list")
+names(ate.ac.nc) <- actorcauses
+
+for (i in 1:(length(actorcauses))){
+  
+  modelformula <- paste(actorcauses[i],right.side.nc)
+  print(modelformula)
+  
+  ate.ac.nc[[actorcauses[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref), 
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.ac.nc[[actorcauses[i]]])) #print results,
+  print(confint(ate.ac.nc[[actorcauses[i]]])) #including CIs
+  
+}
+
+
+####### Figure 1: Preparations ########  
+
+### Get b's and ci's for rootcauses
+cis.rc.em <- matrix(NA,length(rootcauses),2)
+b.rc.em <- matrix(NA,length(rootcauses),1)
+cis.rc.c <- matrix(NA,length(rootcauses),2)
+b.rc.c <- matrix(NA,length(rootcauses),1)
+cis.rc.nc <- matrix(NA,length(rootcauses),2)
+b.rc.nc <- matrix(NA,length(rootcauses),1)
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.em[i] <- ate.rc.em[[i]]$coefficients[2]
+  ci.rc.em <- confint(ate.rc.em[[i]])
+  print(b.rc.em[i])
+  lb.rc.em <- ci.rc.em[2,1]
+  ub.rc.em <- ci.rc.em[2,2]
+  cis.rc.em[i,] <- cbind(lb.rc.em,ub.rc.em)
+}
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.c[i] <- ate.rc.c[[i]]$coefficients[2]
+  ci.rc.c <- confint(ate.rc.c[[i]])
+  print(b.rc.c[i])
+  lb.rc.c <- ci.rc.c[2,1]
+  ub.rc.c <- ci.rc.c[2,2]
+  cis.rc.c[i,] <- cbind(lb.rc.c,ub.rc.c)
+}
+
+for (i in 1:length(rootcauses))
+{
+  b.rc.nc[i] <- ate.rc.nc[[i]]$coefficients[2]
+  ci.rc.nc <- confint(ate.rc.nc[[i]])
+  print(b.rc.nc[i])
+  lb.rc.nc <- ci.rc.nc[2,1]
+  ub.rc.nc <- ci.rc.nc[2,2]
+  cis.rc.nc[i,] <- cbind(lb.rc.nc,ub.rc.nc)
+}
+
+### Get b's and ci's for actor causes
+cis.ac.em <- matrix(NA,length(actorcauses),2)
+b.ac.em <- matrix(NA,length(actorcauses),1)
+cis.ac.c <- matrix(NA,length(actorcauses),2)
+b.ac.c <- matrix(NA,length(actorcauses),1)
+cis.ac.nc <- matrix(NA,length(actorcauses),2)
+b.ac.nc <- matrix(NA,length(actorcauses),1)
+
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.em[i] <- ate.ac.em[[i]]$coefficients[2]
+  ci.ac.em <- confint(ate.ac.em[[i]])
+  print(b.ac.em[i])
+  lb.ac.em <- ci.ac.em[2,1]
+  ub.ac.em <- ci.ac.em[2,2]
+  cis.ac.em[i,] <- cbind(lb.ac.em,ub.ac.em)
+}
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.c[i] <- ate.ac.c[[i]]$coefficients[2]
+  ci.ac.c <- confint(ate.ac.c[[i]])
+  print(b.ac.c[i])
+  lb.ac.c <- ci.ac.c[2,1]
+  ub.ac.c <- ci.ac.c[2,2]
+  cis.ac.c[i,] <- cbind(lb.ac.c,ub.ac.c)
+}
+
+for (i in 1:length(actorcauses))
+{
+  b.ac.nc[i] <- ate.ac.nc[[i]]$coefficients[2]
+  ci.ac.nc <- confint(ate.ac.nc[[i]])
+  print(b.ac.nc[i])
+  lb.ac.nc <- ci.ac.nc[2,1]
+  ub.ac.nc <- ci.ac.nc[2,2]
+  cis.ac.nc[i,] <- cbind(lb.ac.nc,ub.ac.nc)
+}
+
+### Specify y-labs and labels: rootcauses
+y.lab <- seq(from = 1, to=length(rootcauses),by=1)
+rc.vnames <-c(causes_1 = "Economic inequality\n and poverty",
+              causes_2 = "Community-based,\n inequality", 
+              causes_3 = "Discrimination\n and repression",
+              causes_4 = "Lack of Democracy")
+
+### Specify y-labs and labels: actorcauses
+y.lab <- seq(from = 1, to=length(actorcauses),by=1)
+ac.vnames <-c(causes_5 = "Extremist\n Republicans",
+              causes_6 = "Extremist\n Loyalists",
+              causes_7 = "Illegitimate rule\n from Westminster",
+              causes_8 = "Partition of Ireland")
+
+### Jitter to position coefficients
+jitter.c <-  -0.15
+jitter.nc <-  -0.30
+```
+
+```{r plot ref robust Figure 1, echo=FALSE, fig.height = 4, fig.width=6.5, fig.cap="\\label{fig:refrobust1}Replication of Figure 1, Excluding Respondents Interviewed on June 23", results='asis', message=FALSE, warning=FALSE}
+### Set margins
+par(mfrow=c(1,2), mar = c(5, 4, 0, 2), oma = c(0.5, 3.5, 0, 0), mgp=c(2,0.5,0))
+
+### PLOT 1 ### 
+plot(b.rc.c, y.lab, 
+     type="n", 
+     ylab ="", xlab = "", yaxt="n", 
+     xlim = c(-0.6,0.6), ylim = c(0.5,4.5),
+     cex.axis=0.75)
+axis(2, at=y.lab, labels=rc.vnames, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.8)
+#b[CI]s: entropy weights
+points(b.rc.em, y.lab, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.rc.em[,1], y.lab, cis.rc.em[,2], y.lab, lty=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.rc.c, y.lab+jitter.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.rc.c[,1], y.lab+jitter.c, cis.rc.c[,2], y.lab+jitter.c, lty=2, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.rc.nc, y.lab+jitter.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.rc.nc[,1], y.lab+jitter.nc, cis.rc.nc[,2], y.lab+jitter.nc, lty=4, lwd=1, col = "grey50")
+abline(v=0)
+
+### Set margins
+par(mar = c(5, 5, 0, 0.5))
+
+### PLOT 2 ### 
+plot(b.ac.c, y.lab, type="n", ylab ="", xlab = "", yaxt="n", xlim = c(-0.6,0.6), ylim = c(0.5,4.5), 
+     cex.axis=0.75)
+axis(2, at=y.lab, labels=ac.vnames, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.8)
+#b[CI]s: entropy weights
+points(b.ac.em, y.lab, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.ac.em[,1], y.lab, cis.ac.em[,2], y.lab, lty=1, cex=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.ac.c, y.lab+jitter.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.ac.c[,1], y.lab+jitter.c, cis.ac.c[,2], y.lab+jitter.c, lty=2, cex=1, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.ac.nc, y.lab+jitter.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.ac.nc[,1], y.lab+jitter.nc, cis.ac.nc[,2], y.lab+jitter.nc, lty=4, cex=1, lwd=1, col = "grey50")
+abline(v=0)
+
+### Settings to print legend to the device region
+par(xpd=NA)
+
+### LEGEND ### 
+legend(x=-2.3, y=-0.65, horiz = T, cex = 0.7,
+       legend=c("Matching", "Covariates", "No Correction"), 
+       title = "Applied correction for imbalance", 
+       lty = c(1,2,4), col=c("black", "grey20", "grey50"), pch=c(21,4,6))
+```
+
+
+```{r code ref robust Figure 3, include=FALSE}
+#### Preferences for the Future ####
+
+future <- Cs(remain,independence, unification)
+
+#model with entropy matching
+ate.f.em <- vector(length(future), mode = "list")
+names(ate.f.em) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.em[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref, weights = W.out.ref$w), #use weights
+                                                list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.em[[future[i]]]))
+  
+}
+
+#model with controls
+ate.f.c <- vector(length(future), mode = "list")
+names(ate.f.c) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.c)
+  print(modelformula)
+  
+  ate.f.c[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref), 
+                                              list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.c[[future[i]]]))
+  
+}
+
+#model without controls
+ate.f.nc <- vector(length(future), mode = "list")
+names(ate.f.nc) <- future
+
+for (i in 1:(length(future))){
+  
+  modelformula <- paste(future[i],right.side.nc)
+  print(modelformula)
+  
+  ate.f.nc[[future[i]]] <- eval(substitute(lm(.modelformula, data = Brexit.ref),  
+                                                 list(.modelformula = modelformula)))
+  
+  print(summary(ate.f.nc[[future[i]]]))
+  
+}
+
+
+####### Figure 3: Preparations ########  
+
+### Get b's and ci's for preferences for the future
+cis.f.em <- matrix(NA,length(future),2)
+b.f.em <- matrix(NA,length(future),1)
+cis.f.c <- matrix(NA,length(future),2)
+b.f.c <- matrix(NA,length(future),1)
+cis.f.nc <- matrix(NA,length(future),2)
+b.f.nc <- matrix(NA,length(future),1)
+
+
+for (i in 1:length(future))
+{
+  b.f.em[i] <- ate.f.em[[i]]$coefficients[2]
+  ci.f.em <- confint(ate.f.em[[i]])
+  print(b.f.em[i])
+  lb.f.em <- ci.f.em[2,1]
+  ub.f.em <- ci.f.em[2,2]
+  cis.f.em[i,] <- cbind(lb.f.em,ub.f.em)
+}
+
+for (i in 1:length(future))
+{
+  b.f.c[i] <- ate.f.c[[i]]$coefficients[2]
+  print(ate.f.c[[i]]$coefficients[2])
+  ci.f.c <- confint(ate.f.c[[i]])
+  #print(ci)
+  lb.f.c <- ci.f.c[2,1]
+  ub.f.c <- ci.f.c[2,2]
+  cis.f.c[i,] <- cbind(lb.f.c,ub.f.c)
+}
+
+for (i in 1:length(future))
+{
+  b.f.nc[i] <- ate.f.nc[[i]]$coefficients[2]
+  ci.f.nc <- confint(ate.f.nc[[i]])
+  print(b.f.nc[i])
+  lb.f.nc <- ci.f.nc[2,1]
+  ub.f.nc <- ci.f.nc[2,2]
+  cis.f.nc[i,] <- cbind(lb.f.nc,ub.f.nc)
+}
+
+### Specify y-labs and labels: future preferences
+y.lab.f <- seq(from = 1, to=length(future),by=1)
+vnames.f <-c(remain = "Remain Part\n of the UK",
+              independence = "Become an\n Independent State",
+              unification = "Unify with the\n Rest of Ireland")
+
+### Jitter to position coefficients
+jitter.f.c <-  -0.15
+jitter.f.nc <-  -0.30
+```
+
+
+```{r plot ref robust Figure 3, echo=FALSE, fig.height = 4.5, fig.width=4.5, fig.cap="\\label{fig:refrobust3}Replication of Figure 3, Excluding Respondents Interviewed on June 23", results='asis', message=FALSE, warning=FALSE}
+### Set margins
+par(mfrow=c(1,1), mar=c(5, 4, 0, 3), oma=c(0.5, 3.5,0.5,0.2), mgp=c(2,0.8,0))
+
+### PLOT 3
+plot(b.f.c, y.lab.f, type="n", ylab ="", xlab = "", yaxt="n", 
+     xlim = c(-0.4,0.4), ylim = c(0.5,3.5),
+     cex.axis=0.75)
+axis(2, at=y.lab.f, labels=vnames.f, las = 2, cex.axis=0.75)
+mtext("Difference in Means",side=1,line=2,outer=F, cex = 0.85)
+#b[CI]s: entropy weights
+points(b.f.em, y.lab.f, pch=21, cex=1, lwd=1, col = "black")
+segments(cis.f.em[,1], y.lab.f, cis.f.em[,2], y.lab.f, lty=1, cex=1, lwd=1, col = "black")
+#b[CI]s: controls
+points(b.f.c, y.lab.f+jitter.f.c, pch= 4, cex=1, lwd=1, col = "grey20")
+segments(cis.f.c[,1], y.lab.f+jitter.f.c, cis.f.c[,2], y.lab.f+jitter.f.c, lty=2, cex=1, lwd=1, col = "grey20")
+#b[CI]s: nothing
+points(b.f.nc, y.lab.f+jitter.f.nc, pch= 6, cex=1, lwd=1, col = "grey50")
+segments(cis.f.nc[,1], y.lab.f+jitter.f.nc, cis.f.nc[,2], y.lab.f+jitter.f.nc, lty=4, cex=1, lwd=1, col = "grey50")
+abline(v=0)
+
+
+### Settings to print legend to the device region
+par(xpd=NA)
+
+### LEGEND ### 
+legend(x=-0.588, y=-0.25, horiz = T, cex = 0.7,
+       legend=c("Matching", "Covariates", "No Correction"), 
+       title = "Applied correction for imbalance", 
+       lty = c(1,2,4), col=c("black", "grey20", "grey50"), pch=c(21,4,6))
+```
+
+
+\newpage
+
+## D.3. Additional Analyses for Mediation Results
+
+### D.3.1. Sensitivity Analysis
+
+In this section, we conduct a formal sensitivity analysis for the possible existence of unobserved pre-treatment covariates. The sensitvity parameter, rho, denotes the correlation between the residuals of the mediator-outcome relationship. As explained by Imai and Yamamoto (2013), "a large value of rho indicates the existence of strong confounding between the mediator and the outcome, and thus serious violation of the sequential ignorability." By contrast, a rho of zero suggests that no confounders influence the mediator-outcome relationship. 
+
+
+All rho's reported in Table \ref{sens} are smaller than the ones reported in, for instance, Imai and Yamamoto (2013), which were interpreted as "moderately robust." This indicates that the results of our study are slightly more robust to the sequential ignorability violation than those in Imai and Yamamoto [-@Imai2013].\footnote{At the moment of writing, we were unaware of formally recommended cut-off thresholds for what qualifies as a small, medium, or high values of rho to assess robustness. Therefore, we opted to compare our rho with the original studies introducting this quantity of interest (in particular with Imai and Yamamoto, 2013).}
+
+
+```{r sensitivy, include=FALSE}
+cause.8.unify.sens <- medsens(cause.8.unify, rho.by = 0.1, effect.type = "indirect", sims = 1000)
+summary(cause.8.unify.sens)
+
+cause.8.remain.sens <- medsens(cause.8.remain, rho.by = 0.1, effect.type = "indirect", sims = 1000)
+summary(cause.8.remain.sens)
+
+cause.7.unify.sens <- medsens(cause.7.unify, rho.by = 0.1, effect.type = "indirect", sims = 1000)
+summary(cause.7.unify.sens)
+
+cause.7.remain.sens <- medsens(cause.7.remain, rho.by = 0.1, effect.type = "indirect", sims = 1000)
+summary(cause.7.remain.sens)
+```
+
+
+\vspace{3mm}
+\begin{table}[h] \centering
+\caption{Sensitivity Analysis for Both Mediators on Both Outcomes} 
+\label{sens} 
+\begin{tabular}{@{}llcc@{}}
+\toprule
+\hline
+& & Unify with Ireland & Remain part of UK \\ \midrule
+\multicolumn{2}{l}{Mediator: Partitioning of Ireland as a conflict cause} &  & \\
+& Rho at which ACME for Control Group = 0    & 0.3       & -0.2 \\
+& Rho at which ACME for Treatment Group = 0  & 0.3       & -0.2 \\
+\multicolumn{2}{l}{Mediator: Illegitimate rule of Westminster as a conflict cause} & & \\
+& Rho at which ACME for Control Group = 0    & 0.3       & -0.3 \\
+& Rho at which ACME for Treatment Group = 0  & 0.3       & -0.3 \\ 
+\hline
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\newpage
+### D.3.2. Relationship between Mediators and Preferences for the Future of Northern Ireland
+
+Table \ref{meds} shows the association between the mediators (as independent variables) and the likelihood to desire to unify with the rest of Ireland or to remain part of the UK (as dependent variables). Both models are estimated including the full range of conflict cause perceptions, with the exception of one of both actor-based causes since they are strongly correlated to the extent they cause multicollinearity issues (see also Figure \ref{cortab}).
+
+```{r meds on unification, include=FALSE}
+#fit the regression model
+meds.unification.7 <- lm(unification ~ cause_1 + cause_2 + cause_3 + cause_4 + cause_5 + cause_7, 
+                        data = Brexit)
+meds.unification.8 <- lm(unification ~ cause_1 + cause_2 + cause_3 + cause_4 + cause_5 + cause_8, 
+                        data = Brexit)
+#view the output of the regression model
+summary(meds.unification.7)
+summary(meds.unification.8)
+
+#calculate the VIF for each predictor variable in the model
+vif(meds.unification.7)
+vif(meds.unification.8)
+```
+
+
+```{r meds on remain, include=FALSE}
+#fit the regression model
+meds.remain.7 <- lm(remain ~ cause_1 + cause_2 + cause_3 + cause_4 + cause_5 + cause_7,
+                   data = Brexit)
+meds.remain.8 <- lm(remain ~ cause_1 + cause_2 + cause_3 + cause_4 + cause_5 + cause_8,
+                   data = Brexit)
+
+#view the output of the regression model
+summary(meds.remain.7)
+summary(meds.remain.8)
+
+#calculate the VIF for each predictor variable in the model
+vif(meds.remain.7)
+vif(meds.remain.8)
+```
+
+
+
+```{r, echo=FALSE, results='asis', message=FALSE}
+stargazer(meds.unification.7, meds.unification.8, meds.remain.7, meds.remain.8,
+          title="Relationship between Mediators and Preferences for the Future of Northern Ireland",
+          model.numbers = F,
+          omit.stat = c("ser", "f"),
+          type='latex',           
+          font.size = 'small',
+          header=FALSE,
+          label = "meds",
+          star.char = c("+", "*", "**", "***"),
+          star.cutoffs = c(.1, .05, .01, .001),
+          notes = c("+ p<0.1; * p<0.05; ** p<0.01; *** p<0.001"),
+          notes.append = F,
+          notes.align = "l")
+```
+
+\newpage
+
+## D.4. Google Trends Data in Northern Ireland vs. Great Britain
+
+In the paper, we argue that feelings of neglect, alongside media priming and uncertainty about the future, help explain post-Brexit public opinion in Northern Ireland. To provide some empirical evidence of this theoretical claim, Figure \ref{fig:trends} plots the search interests of the general public in the UK before and after Brexit. Specifically, we examine how prominent issues related to the Troubles and Peace Protocol were compared to issues related to immigration (i.e., another prominent issue in the Brexit campaign) in both Northern Ireland and Great Britain. Figure \ref{fig:trends} shows that during the entire Brexit campaign and aftermath, people in Great Britain barely searched for issues related to the Troubles (i.e., the black line always hovers around a value of 0 in the lower graph). In contrast, the Troubles were salient and overshadowed the more general issue of immigration in Northern Ireland at several occasions and especially in the direct aftermath of Brexit. This suggests that people in Northern Ireland were worried about the Troubles in the aftermath of Brexit, even more than about immigration, but that this was not the case for people in the rest of the UK.
+
+
+```{r include=FALSE}
+
+# Google Trends in Northern Ireland -----------
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+gt1 <- read.csv(file = "Data/Brexit_GT_NI.csv")
+
+gt_ni <- gt1 %>%
+  mutate(immigration = Immigration...Northern.Ireland.) %>%
+  mutate(troubles = Good.Friday.Agreement...Northern.Ireland.+the.Troubles...Northern.Ireland.) %>%
+  mutate(date = as.Date(Day)) %>%
+  #select(date, immigration, troubles) %>%
+  gather(search, share, immigration:troubles) %>%
+  filter(share > 0)
+str(gt_ni)
+
+# plot 1
+gt_ni_plot <- ggplot(gt_ni, aes(x=date, y=share, group=search)) +
+  geom_line(aes(color=search), size=0.5) +
+  geom_point(aes(color=search))+
+  geom_vline(xintercept=as.Date("2016-06-23"), linetype=1, size=1,color="#2F7B8E") +
+  theme(legend.position="right")+
+  theme_classic() +
+  theme(plot.title = element_text(size=11),
+        legend.text = element_text(size = 10, colour = "black"),
+        axis.text = element_text(size = 10, colour = "black")) +
+  labs(title = "A. Northern Ireland", x = "", y = "", color = "Search term", linetype = "Search term")+
+  scale_colour_grey(start = 0.7, end = 0.2,
+                    breaks = c("immigration", "troubles"),
+                    labels = c("Immigration", "The Troubles")) +
+  scale_x_date(breaks = as.Date(c("2016-04-15", "2016-06-23", "2016-09-01")), 
+               labels = c("April 4", "June 23\n EU Referendum", "Sep 1"))
+``` 
+
+
+```{r include=FALSE}
+# Google Trends in Great Britain -----------
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+gt2 <- read.csv(file = "Data/Brexit_GT_England.csv")
+gt3 <- read.csv(file = "Data/Brexit_GT_Scotland.csv")
+gt4 <- read.csv(file = "Data/Brexit_GT_Wales.csv")
+# merge GT dataframes
+gt_gb <- merge(gt2, gt3, by="Day")
+gt_gb <- merge(gt_gb, gt4, by="Day")
+# clean GT data GB
+gt_gb <- gt_gb %>%
+  mutate(immigration = (Immigration...England.+
+                          Immigration...Scotland.+
+                          Immigration...Wales.)/3) %>%
+  mutate(troubles = ((Good.Friday.Agreement...England.+
+                       Good.Friday.Agreement...Scotland.+
+                       Good.Friday.Agreement...Wales.)/3)+ 
+           ((the.Troubles...England.+ 
+              the.Troubles...Scotland.+
+              the.Troubles...Wales.)/3)) %>%
+  mutate(date = as.Date(Day)) %>%
+  select(date, immigration, troubles) %>%
+  gather(search, share, immigration:troubles) %>%
+  filter(share > 0)
+str(gt_gb)
+
+# plot 2
+gt_gb_plot <- ggplot(gt_gb, aes(x=date, y=share, group=search)) +
+  geom_line(aes(color=search), size=0.5)+
+  geom_point(aes(color=search))+
+  geom_vline(xintercept=as.Date("2016-06-23"), linetype=1, size=1,color="#2F7B8E") +
+  theme(legend.position="right")+
+  theme_classic() +
+  theme(plot.title = element_text(size=11),
+        legend.text = element_text(size = 10, colour = "black"),
+        axis.text = element_text(size = 10, colour = "black")) +
+  labs(title = "B. Great Britain", x = "", y = "", color = "Search term", linetype = "Search term")+
+  scale_colour_grey(start = 0.7, end = 0.2,
+                    breaks = c("immigration", "troubles"),
+                    labels = c("Immigration", "The Troubles")) +
+  scale_x_date(breaks = as.Date(c("2016-04-15", "2016-06-23", "2016-09-01")), 
+               labels = c("April 4", "June 23\n EU Referendum", "Sep 1"))
+```
+
+```{r include=FALSE}
+# function to arrange plots with shared legend at the bottom
+grid_arrange_shared_legend <- function(...) {
+  plots <- list(...)
+  g <- ggplotGrob(plots[[1]] + theme(legend.position="bottom"))$grobs
+  legend <- g[[which(sapply(g, function(x) x$name) == "guide-box")]]
+  lheight <- sum(legend$height)
+  grid.arrange(
+    do.call(arrangeGrob, lapply(plots, function(x)
+      x + theme(legend.position="none"))),
+    legend,
+    ncol = 1,
+    heights = unit.c(unit(1, "npc") - lheight, lheight))
+}
+
+figure <- grid_arrange_shared_legend(gt_ni_plot, gt_gb_plot, nrow = 2)
+```
+
+
+```{r, echo=FALSE, fig.height = 6, fig.width = 5.5, fig.cap="\\label{fig:trends}Relative Google Trends for Searches Related to Immigration and the Troubles in Northern Ireland Versus Great Britain Before and After Brexit", results='asis', message=FALSE}
+annotate_figure(figure,
+                bottom = text_grob("Data source: Google Trends\nNumbers represent search interest relative to the highest point on the chart for the given region and time.\nA value of 100 is the peak popularity for the term. A value of 50 means that the term is half as popular.\nA score of 0 means there was not enough data for this term.", color = "black",
+                                   hjust = 1, x = 1, face = "italic", size = 8))
+```
+
+\newpage
+
+## D.5. Comparing Preferences for the Future across Different Surveys
+
+When asking about people's preferences for the constitutional future of Northern Ireland, we followed the question and answer options of the Northern Ireland Life and Times Survey [@NILTSurvey2016]. By doing so, we included what we saw as all theoretically interesting and politically relevant options for Northern Ireland: remain part of the UK with direct or devolved rule, unify with Ireland, or become independent. However, as noted in the manuscript, if the Northern Irish are ever presented with a referendum on their constitutional future, both the Good Friday Agreement and Northern Ireland Act 1998 stipulate only two options: remain part of the UK or form part of a united Ireland. To examine the effect of including more response options than legally plausible, we compare the distribution of our survey (conducted before and after the referendum) and of the NILT 2016 (conducted only after the referendum), with the distribution in @Garry2018 In their 2018 survey, Garry and colleagues restricted themselves to the options legally stipulated by the Good Friday Agreement and the UK’s Northern Ireland Act 1998 (i.e., to remain part of the UK or form a united Ireland) and added a "would not vote" option. 
+
+
+As Table \ref{tab:preferences} shows, the share of people who want to remain part of the UK further is substantially lower in the @Garry2018 data and the share of people who prefer a united Ireland is slightly higher. However, it is also important here to keep in mind the timing of the various surveys. The Garry et al. survey did not only differ in the response options provided to respondents, but it was also conducted more than two years after our survey. It is, therefore, plausible that these differences are not just a result of different response options, but also indicate a long-term trend. As we briefly mention in the manuscript, our results suggest that the Brexit campaign has made people less enthusiastic about remaining part of the United Kingdom. If the same narratives that were dominant during the campaign are also alluded to in the post-Brexit period (and there are indications that this is the case), then this may also help to explain this decline. Finally, respondents in the Garry et al. (2018) study were also more likely to report not knowing what to vote for. Again, both differences in the response options and time trends may help explain this (among other possible explanations). In terms of response options, omitting independence might have made the question harder to answer in the Garry et al. (2018) study, given that independence is seen as a valid option by 4% to 7% of the Northern Irish in the NILT 2016 or our study, respectively. In terms of trends over time, the uncertainty and controversy surrounding Brexit may have also made this a more difficult question in 2018 and caused people to question their initial opinions.
+
+
+```{r, include=FALSE}
+table1 <- table(Brexit$q603ni)
+prop.table(table1)*100
+```
+
+\begin{table}[!ht]
+\caption{Comparison in Preferences for the Future across Different Surveys}
+\label{tab:preferences}
+\begin{tabular}{@{}P{7.7cm}M{2.5cm}M{2.5cm}M{2.5cm}@{}}
+\toprule
+\hline
+                                                            & Our 2016 survey & NILT 2016 survey & Garry et al. (2018) survey \\ \midrule
+Remain part of the UK, with direct rule         & 10.10\%   & 12\%       & \multirow{2}{*}{50.30\%}    \\
+Remain part of the UK, with devolved rule & 52.60\%   & 54\%       &                            \\
+Reunify with the rest of Ireland                            & 16.90\%   & 19\%       & 21.10\%                     \\
+Become an independent state                                 & 6.90\%    & 4\%        & NA                         \\
+Other/Don't know                                            & 13.50\%   & 11\%       & 18.90\%                     \\
+Would not vote                                              & NA        & NA         & 9.70\%                      \\ \hline
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+# Bibliography

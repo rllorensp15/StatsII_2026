@@ -1,0 +1,4 @@
+"0","#load and clean the data"
+"0","brexit_polls <- import(""Data/Brexit_Polls.Rdata"") %>%"
+"0","  gather(vote, share, remain:undecided) %>%"
+"0","  filter(date > as.Date(""2016-04-14"") & vote != ""undecided"")"

@@ -1,0 +1,13 @@
+"0","ptsd <- c(""q411_1"", ""q411_2"", ""q411_3"", ""q411_4"", ""q411_5"", ""q411_6"")"
+"0","PTSD <- Brexit[ptsd]"
+"0","psych::alpha(PTSD)"
+"1","
+Reliability analysis "
+"1"," "
+"1"," 
+"
+"1","Call: "
+"1","psych::alpha(x = PTSD)
+"
+"1","
+ "

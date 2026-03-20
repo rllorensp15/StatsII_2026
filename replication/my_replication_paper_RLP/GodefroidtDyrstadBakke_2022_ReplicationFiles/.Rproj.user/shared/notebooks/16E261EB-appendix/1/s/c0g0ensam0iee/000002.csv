@@ -1,0 +1,5 @@
+"0","table1 <- table(Brexit$q603ni)"
+"2","Unknown or uninitialised column: `q603ni`."
+"0","prop.table(table1)*100"
+"1","numeric(0)
+"

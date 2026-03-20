@@ -1,0 +1,60 @@
+"0","sumstat <- Brexit %>%"
+"0","  "
+"0","  # Select and rename variables "
+"0","  dplyr::select("
+"0","    `Gender` = male,"
+"0","    `Age (in years)` = age,"
+"0","    `Level of education` = education,"
+"0","    `Employed (in %)` = employment_1,"
+"0","    `Living in a rural neighborhood (in %)` = rural,"
+"0","    `Religiosity` = religiosity,"
+"0","    `Community/Religion` = community,"
+"0","    `Political interest` = polinterest,"
+"0","    `Political participation (% non-voters)` = nonvote,"
+"0","    `Resided in NI during the Trouble (in %)` = reside,"
+"0","    `Exposure to violence (in %)` = exposure,"
+"0","    `Post-traumatic stress symptoms` = ptsd ) "
+"0",""
+"0","sumtable(sumstat,"
+"0","         summ = list("
+"0","           c('notNA(x)','mean(x)','sd(x)','min(x)','max(x)'),"
+"0","           c('notNA(x)','mean(x)')"
+"0","           ),"
+"0","         summ.names = list("
+"0","           c('N','Mean','SD','Min','Max'),"
+"0","           c('Count','Percent')"
+"0","           ), out = ""latex"")"
+"1","\begin{table}[!htbp] \centering \renewcommand*{\arraystretch}{1.1}\caption{Summary Statistics}\resizebox{\textwidth}{!}{
+\begin{tabular}{lrrrrr}
+\hline
+\hline
+Variable & N & Mean & SD & Min & Max \\ 
+\hline
+Gender & 813 &  &  &  &  \\ 
+... Male & 431 & 53\% &  &  &  \\ 
+... Female & 382 & 47\% &  &  &  \\ 
+Age (in years) & 813 & 46.258 & 18.212 & 18 & 96 \\ 
+Level of education & 811 &  &  &  &  \\ 
+... Primary school or below & 40 & 4.9\% &  &  &  \\ 
+... Post-primary (year 8 to year 12) & 271 & 33.4\% &  &  &  \\ 
+... Post-primary (year 13-14/A level) & 136 & 16.8\% &  &  &  \\ 
+... Further education & 149 & 18.4\% &  &  &  \\ 
+... Higher education & 215 & 26.5\% &  &  &  \\ 
+Employed (in \%) & 811 & 0.508 & 0.5 & 0 & 1 \\ 
+Living in a rural neighborhood (in \%) & 813 & 0.423 & 0.494 & 0 & 1 \\ 
+Religiosity & 805 & 2.883 & 1.817 & 1 & 7 \\ 
+Community/Religion & 813 &  &  &  &  \\ 
+... Protestant & 405 & 49.8\% &  &  &  \\ 
+... Catholic & 352 & 43.3\% &  &  &  \\ 
+... None/other & 56 & 6.9\% &  &  &  \\ 
+Political interest & 811 & 2.153 & 1.008 & 1 & 4 \\ 
+Political participation (\% non-voters) & 813 & 0.332 & 0.471 & 0 & 1 \\ 
+Resided in NI during the Trouble (in \%) & 813 & 0.85 & 0.357 & 0 & 1 \\ 
+Exposure to violence (in \%) & 813 & 0.391 & 0.488 & 0 & 1 \\ 
+Post-traumatic stress symptoms & 811 & 1.248 & 0.649 & 1 & 5\\ 
+\hline
+\hline
+\end{tabular}
+}
+\end{table}
+"

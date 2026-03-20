@@ -1,0 +1,6 @@
+"0","#demographics"
+"0","gender <- glm(male ~ referendum, data = Brexit, family = ""binomial"")"
+"0","age <- lm(age ~ referendum, data = Brexit)"
+"0","education <- lm(as.numeric(education) ~ referendum, data = Brexit)"
+"0","employed <- glm(employment_1 ~ referendum, data = Brexit, family = ""binomial"")"
+"0","rural <- glm(rural ~ referendum, data = Brexit, family = ""binomial"")"

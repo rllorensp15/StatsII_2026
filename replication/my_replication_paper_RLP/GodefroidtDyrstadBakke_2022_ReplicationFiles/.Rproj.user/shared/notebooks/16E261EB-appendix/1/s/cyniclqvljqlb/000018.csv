@@ -1,0 +1,4 @@
+"0",""
+"0","### PLOT 2 ### "
+"0","plot(b.ac.c, y.lab, type=""n"", ylab ="""", xlab = """", yaxt=""n"", xlim = c(-0.6,0.6), ylim = c(0.5,4.5), "
+"0","     cex.axis=0.75)"

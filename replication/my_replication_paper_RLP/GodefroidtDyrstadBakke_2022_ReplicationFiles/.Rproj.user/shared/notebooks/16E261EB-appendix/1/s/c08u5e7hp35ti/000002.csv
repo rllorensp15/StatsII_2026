@@ -1,0 +1,3 @@
+"0","#religion (also tied to the conflict)"
+"0","religiosity <- lm(religiosity ~ referendum, data = Brexit)"
+"0","religion <- glm(as.factor(community) ~ referendum, data = Brexit, family = ""binomial"")"

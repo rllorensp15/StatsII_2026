@@ -1,0 +1,4 @@
+"0","unification.rdd = lm(unification ~ time_zero+referendum+(time_zero*referendum), data = Brexit,"
+"0","              weights = W.out$w)"
+"0","remain.rdd = lm(remain ~ time_zero+referendum+(time_zero*referendum), data = Brexit,"
+"0","              weights = W.out$w)"
