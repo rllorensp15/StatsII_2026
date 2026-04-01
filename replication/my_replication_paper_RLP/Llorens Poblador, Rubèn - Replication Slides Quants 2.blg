@@ -1,0 +1,9 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'Llorens Poblador, Rubèn - Replication Slides Quants 2.blg'
+[123] biber-MSWIN64:342> INFO - === 
+[184] Biber.pm:421> INFO - Reading 'Llorens Poblador, Rubèn - Replication Slides Quants 2.bcf'
+[366] Biber.pm:1002> INFO - Found 0 citekeys in bib section 0
+[394] bbl.pm:676> INFO - Writing 'Llorens Poblador, Rubèn - Replication Slides Quants 2.bbl' with encoding 'UTF-8'
+[395] bbl.pm:779> INFO - Output to Llorens Poblador, Rubèn - Replication Slides Quants 2.bbl
+[395] Biber.pm:132> WARN - The file 'Llorens Poblador, Rubèn - Replication Slides Quants 2.bcf' does not contain any citations!
+[395] Biber.pm:134> INFO - WARNINGS: 1
