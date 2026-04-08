@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.9)  1 APR 2026 22:51
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.9)  8 APR 2026 14:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1439,12 +1439,8 @@ thkerncmss.
 <Fig3.jpeg, id=209, 361.35pt x 361.35pt>
 File: Fig3.jpeg Graphic file (type jpg)
 <use Fig3.jpeg>
-Package pdftex.def Info: Fig3.jpeg  used on input line 94.
-(pdftex.def)             Requested size: 240.93567pt x 240.93433pt.
-
-Overfull \vbox (56.96762pt too high) detected at line 94
- []
-
+Package pdftex.def Info: Fig3.jpeg  used on input line 98.
+(pdftex.def)             Requested size: 172.09766pt x 172.09515pt.
 
 
 [6
@@ -1454,30 +1450,30 @@ Overfull \vbox (56.96762pt too high) detected at line 94
 [7
 
 ]
-<plot_ext1.png, id=278, 722.7pt x 433.62pt>
+<plot_ext1.png, id=279, 722.7pt x 433.62pt>
 File: plot_ext1.png Graphic file (type png)
 <use plot_ext1.png>
-Package pdftex.def Info: plot_ext1.png  used on input line 125.
+Package pdftex.def Info: plot_ext1.png  used on input line 131.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
 [8
 
  <./plot_ext1.png>]
-<plot_ext2.png, id=306, 722.7pt x 433.62pt>
+<plot_ext2.png, id=307, 722.7pt x 433.62pt>
 File: plot_ext2.png Graphic file (type png)
 <use plot_ext2.png>
-Package pdftex.def Info: plot_ext2.png  used on input line 140.
+Package pdftex.def Info: plot_ext2.png  used on input line 146.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
 [9
 
  <./plot_ext2.png>]
-<plot_ext3.png, id=336, 722.7pt x 433.62pt>
+<plot_ext3.png, id=337, 722.7pt x 433.62pt>
 File: plot_ext3.png Graphic file (type png)
 <use plot_ext3.png>
-Package pdftex.def Info: plot_ext3.png  used on input line 155.
+Package pdftex.def Info: plot_ext3.png  used on input line 161.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
@@ -1489,7 +1485,7 @@ Package pdftex.def Info: plot_ext3.png  used on input line 155.
 
 ]
 
-LaTeX Warning: Empty bibliography on input line 171.
+LaTeX Warning: Empty bibliography on input line 177.
 
 
 
@@ -1519,10 +1515,10 @@ on Slides Quants 2".run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 32573 strings out of 468130
- 639656 string characters out of 5429665
- 1558476 words of memory out of 5000000
- 60593 multiletter control sequences out of 15000+600000
+ 32577 strings out of 468130
+ 639748 string characters out of 5429665
+ 1558526 words of memory out of 5000000
+ 60596 multiletter control sequences out of 15000+600000
  639176 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  128i,15n,123p,747b,5050s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -1543,9 +1539,9 @@ c/amsfonts/cm/cmss10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/amsfonts/cm/cmssi10.pfb><C:/Users/Usuario/AppData/Local/Programs/M
 iKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 Output written on "Llorens Poblador, Rubèn - Replication Slides Quants 2.pdf" 
-(12 pages, 1253894 bytes).
+(12 pages, 1254351 bytes).
 PDF statistics:
- 764 PDF objects out of 1000 (max. 8388607)
- 28 named destinations out of 1000 (max. 500000)
+ 766 PDF objects out of 1000 (max. 8388607)
+ 29 named destinations out of 1000 (max. 500000)
  224 words of extra memory for PDF output out of 10000 (max. 10000000)
 
