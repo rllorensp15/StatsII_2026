@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.9)  8 APR 2026 14:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (MiKTeX 25.4) (preloaded format=pdflatex 2025.10.9)  8 APR 2026 23:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1412,20 +1412,20 @@ Package biblatex Info: Reference segment=0 on input line 31.
 <Fig1.jpeg, id=180, 578.16pt x 361.35pt>
 File: Fig1.jpeg Graphic file (type jpg)
 <use Fig1.jpeg>
-Package pdftex.def Info: Fig1.jpeg  used on input line 83.
+Package pdftex.def Info: Fig1.jpeg  used on input line 82.
 (pdftex.def)             Requested size: 172.09766pt x 107.55672pt.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 83.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 82.
 
  (C:\Users\Usuario\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 83.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 82.
 
 (C:\Users\Usuario\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    Trying to load font information for OT1+mathkerncmss on inp
-ut line 83.
+ut line 82.
 
 (C:\Users\Usuario\AppData\Local\Programs\MiKTeX\tex/latex/sansmathaccent\ot1mat
 hkerncmss.fd
@@ -1439,7 +1439,7 @@ thkerncmss.
 <Fig3.jpeg, id=209, 361.35pt x 361.35pt>
 File: Fig3.jpeg Graphic file (type jpg)
 <use Fig3.jpeg>
-Package pdftex.def Info: Fig3.jpeg  used on input line 98.
+Package pdftex.def Info: Fig3.jpeg  used on input line 97.
 (pdftex.def)             Requested size: 172.09766pt x 172.09515pt.
 
 
@@ -1453,7 +1453,7 @@ Package pdftex.def Info: Fig3.jpeg  used on input line 98.
 <plot_ext1.png, id=279, 722.7pt x 433.62pt>
 File: plot_ext1.png Graphic file (type png)
 <use plot_ext1.png>
-Package pdftex.def Info: plot_ext1.png  used on input line 131.
+Package pdftex.def Info: plot_ext1.png  used on input line 130.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
@@ -1463,7 +1463,7 @@ Package pdftex.def Info: plot_ext1.png  used on input line 131.
 <plot_ext2.png, id=307, 722.7pt x 433.62pt>
 File: plot_ext2.png Graphic file (type png)
 <use plot_ext2.png>
-Package pdftex.def Info: plot_ext2.png  used on input line 146.
+Package pdftex.def Info: plot_ext2.png  used on input line 145.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
@@ -1473,7 +1473,7 @@ Package pdftex.def Info: plot_ext2.png  used on input line 146.
 <plot_ext3.png, id=337, 722.7pt x 433.62pt>
 File: plot_ext3.png Graphic file (type png)
 <use plot_ext3.png>
-Package pdftex.def Info: plot_ext3.png  used on input line 161.
+Package pdftex.def Info: plot_ext3.png  used on input line 160.
 (pdftex.def)             Requested size: 172.09766pt x 103.2571pt.
 
 
@@ -1485,7 +1485,7 @@ Package pdftex.def Info: plot_ext3.png  used on input line 161.
 
 ]
 
-LaTeX Warning: Empty bibliography on input line 177.
+LaTeX Warning: Empty bibliography on input line 176.
 
 
 
@@ -1539,9 +1539,9 @@ c/amsfonts/cm/cmss10.pfb><C:/Users/Usuario/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/amsfonts/cm/cmssi10.pfb><C:/Users/Usuario/AppData/Local/Programs/M
 iKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
 Output written on "Llorens Poblador, Rubèn - Replication Slides Quants 2.pdf" 
-(12 pages, 1254348 bytes).
+(12 pages, 1252751 bytes).
 PDF statistics:
- 766 PDF objects out of 1000 (max. 8388607)
+ 761 PDF objects out of 1000 (max. 8388607)
  29 named destinations out of 1000 (max. 500000)
  224 words of extra memory for PDF output out of 10000 (max. 10000000)
 
